@@ -112,7 +112,7 @@ def test_plot_sim(dummy_sim, quantity):
 
     Args:
         dummy_sim (tuple): simulation data and class
-        quantity (string): quantity to plot the variance
+        quantity (string): quantity to plot
     """
     (
         tot_sims,
@@ -138,7 +138,7 @@ def test_animate_sim(dummy_sim, quantity):
 
     Args:
         dummy_sim (tuple): simulation data and class
-        quantity (string): quantity to plot the variance
+        quantity (string): quantity to plot
     """
     (
         tot_sims,
