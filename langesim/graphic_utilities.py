@@ -59,8 +59,9 @@ def animate_simulation(
         )
     num_points = 1000
     xx = np.linspace(*x_range, num_points)
+    # range should be automatic (default) for histograms or bug with outliers
     histos = [
-        np.histogram(xst[:, ti], density=True, range=x_range, bins=bins)
+        np.histogram(xst[:, ti], density=True, bins=bins)
         for ti in range(0, len(times))
     ]
     if harmonic_potential:

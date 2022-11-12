@@ -353,7 +353,8 @@ class Simulation:
             quantity (string): quantity to build its histogram. Should be in ["x", "power", "work", "heat", "delta_U", "energy"]
             bins (int, optional): bins for the histogram. Defaults to 300.
             q_range (list, optional): range for the quantity. Defaults to
-            None for automatic range.
+            None for automatic range. Warning: not using automatic range can
+            introduce bugs in the histograms if there are outliers.
         """
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
