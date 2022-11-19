@@ -11,16 +11,18 @@ def make_sampler(pdf, range=(-25, 25), bins=10000001):
 
     Args:
         pdf (function(x)): probability density function to draw the
-          samples. Does not need to be normalized
+            samples. Does not need to be normalized
         range (tuple, optional): range for the random variable values. Defaults to (-25,25).
         bins (int, optional): bins to build the discretized inverse
-        cumulative distribution function. Defaults to 10000001.
+            cumulative distribution function. Defaults to 10000001.
 
     Returns:
         sampler_single, sampler_multi (tuple of functions): samplers that
         provide random numbers distributed with the given pdf.
-          sampler_single() returns one single value.
-          sampler_multi(n) return n random values.
+        
+        sampler_single() returns one single value.
+        
+        sampler_multi(n) return n random values.
     """
 
     def normalisation(x):

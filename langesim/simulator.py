@@ -34,7 +34,7 @@ def make_simulator(
         center (float function, optional): center function of the potential. Defaults to center(t)=0.0.
 
     Returns:
-        njitted function: numba compiled function that performs simulation
+        njitted function: numba compiled function that performs simulations
     """
     if harmonic_potential:
         if k == None:
@@ -101,27 +101,23 @@ def make_simulator(
             )
             # We need the potential from the force
             # this will never run:
-            f = nb.njit(force)
+            # f = nb.njit(force)
 
-            def potential(x, t):
-                # Integral by basic numerical quadrature trapezoidal rule
-                # This is way too slow
-                dx = 1e-6
-                x0 = 0.0
-                xs = np.arange(x0 + dx, x - dx, dx)
-                integral = 0.5 * (f(x0, t) + f(x, t))
-                for xp in xs:
-                    integral += f(xp, t)
-                integral = integral * dx
-                return integral
+            # def potential(x, t):
+            #     # Integral by basic numerical quadrature trapezoidal rule
+            #     # This is way too slow
+            #     dx = 1e-6
+            #     x0 = 0.0
+            #     xs = np.arange(x0 + dx, x - dx, dx)
+            #     integral = 0.5 * (f(x0, t) + f(x, t))
+            #     for xp in xs:
+            #         integral += f(xp, t)
+            #     integral = integral * dx
+            #     return integral
 
         if initial_distribution == None:
             initial_distribution, _ = make_sampler(lambda x: np.exp(-potential(x, 0)))
-            # raise ValueError('In general force mode the initial distribution has to be provided')
-            # P(x) = exp(-U(x,0))/Z(0) :
-            # To be implemented for non harmonic potential,
-            # see inverse transform sampling
-            # Challenge: it has to be numba njittable.
+
         initial_distribution = nb.njit(initial_distribution)
 
         f = nb.njit(force)
@@ -291,21 +287,30 @@ class Simulation:
             snapshot_step (int): a snapshot of simulation has been saved each snapshot_step time.
             k (float function): stiffness of the potential
             center (float function): center of the potential
-            results (tuple): results in the form (times, x, power, work, heat, delta_U, energy) where
-              times (ndarray): ndarray of times where snapshot where taken
-              x (ndarray of shape (tot_sims, tot_snapshots)): x[sim][ts] = position of
-                the brownian particle in simulation number num and snapshot ts
-              power (ndarray of shape (tot_sims, tot_snapshots)): power[sim][ts] = power into
-                the system at snapshot ts and simulation sim
-              work (ndarray of shape (tot_sims, tot_snapshots)): work[sim][ts] perfomed into
-                the system in simulation sim up to snapshot ts
-              heat (ndarray of shape (tot_sims, tot_snapshots)): heat[sim][ts] into
-                the system in simulation sim up to snapshot ts
-              delta_U (ndarray of shape (tot_sims, tot_snapshots)): energy[sim][ts]
-                difference between snapshot = 0 and current snapshot ts in
-                simulation sim
-              energy (ndarray of shape (tot_sims, tot_snapshots)):
-              energy[sim][ts] in simulation sim at snapshot ts
+            results (tuple): results in the form (times, x, power, work, heat, delta_U, energy) where:
+            
+                times (ndarray): 
+                    ndarray of times where snapshot where taken.
+            
+                x (ndarray of shape (tot_sims, tot_snapshots)): 
+                    x[sim][ts] is the position of the brownian particle in simulation number num and snapshot ts
+
+                power (ndarray of shape (tot_sims, tot_snapshots)): 
+                    power[sim][ts] is the power into the system at snapshot ts and simulation sim
+                
+                work (ndarray of shape (tot_sims, tot_snapshots)): 
+                    work[sim][ts] is the work perfomed into the system in simulation sim up to snapshot ts
+                
+                heat (ndarray of shape (tot_sims, tot_snapshots)): 
+                    heat[sim][ts] into the system in simulation sim up to snapshot ts
+            
+                delta_U (ndarray of shape (tot_sims, tot_snapshots)): 
+                    delta_U[sim][ts] is the energy difference between snapshot = 0 and current snapshot ts in
+                    simulation sim
+                
+                energy (ndarray of shape (tot_sims, tot_snapshots)):
+                    energy[sim][ts] in simulation sim at snapshot ts
+            
             name (string, optional): name of the simulation
             harmonic_potential(boolean, optional): True if the potential is harmonic
             force (float function(x,t), optional): force when the potential
@@ -504,7 +509,7 @@ class Simulation:
             equilibrium position distribution is shown. Defaults to None.
 
         Raises:
-            ValueError: quantity is not in ["x", "power", "work", "heat", "delta_U", "energy"]
+            ValueError: if quantity is not in ["x", "power", "work", "heat", "delta_U", "energy"]
 
         Returns:
             plotly.graph_objects.figure: animation of the PDF
@@ -555,7 +560,7 @@ class Simulation:
             raise TypeError(f'File "{filename}" does not contain a simulation.')
 
     def analyse(self):
-        """Builds all histogram, PDF, averages and variances"""
+        """Builds all histograms, PDF, averages and variances"""
         for k in self.result_labels:
             self.build_histogram(k)
             self.build_pdf(k)
@@ -865,8 +870,7 @@ class Simulator:
         """Performs the analysis of simulation number sim_num
 
         Args:
-            sim_num (int, optional): simulation number. Defaults to last
-            simulation preformed.
+            sim_num (int, optional): simulation number. Defaults to last simulation performed.
         """
         if sim_num == None:
             sim_num = self.simulations_performed - 1
