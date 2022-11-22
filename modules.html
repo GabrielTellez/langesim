@@ -3,16 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>langesim &mdash; Langesim 0.1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <title>langesim &mdash; Langesim 0.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -35,7 +38,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">langesim</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="langesim.html">langesim package</a></li>
@@ -68,15 +71,47 @@
            <div itemprop="articleBody">
              
   <div class="section" id="langesim">
-<h1>langesim<a class="headerlink" href="#langesim" title="Permalink to this headline">¶</a></h1>
+<h1>langesim<a class="headerlink" href="#langesim" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="langesim.html">langesim package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="langesim.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="langesim.html#langesim-graphic-utilities-module">langesim.graphic_utilities module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="langesim.html#langesim-sampler-module">langesim.sampler module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="langesim.html#langesim-simulator-module">langesim.simulator module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="langesim.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langesim.html#module-langesim.graphic_utilities">langesim.graphic_utilities module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langesim.html#langesim.graphic_utilities.animate_simulation"><code class="docutils literal notranslate"><span class="pre">animate_simulation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langesim.html#langesim.graphic_utilities.plot_quantity"><code class="docutils literal notranslate"><span class="pre">plot_quantity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langesim.html#module-langesim.sampler">langesim.sampler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langesim.html#langesim.sampler.make_sampler"><code class="docutils literal notranslate"><span class="pre">make_sampler()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langesim.html#module-langesim.simulator">langesim.simulator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation"><code class="docutils literal notranslate"><span class="pre">Simulation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.__init__"><code class="docutils literal notranslate"><span class="pre">Simulation.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.analyse"><code class="docutils literal notranslate"><span class="pre">Simulation.analyse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.animate_pdf"><code class="docutils literal notranslate"><span class="pre">Simulation.animate_pdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.build_averages"><code class="docutils literal notranslate"><span class="pre">Simulation.build_averages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.build_histogram"><code class="docutils literal notranslate"><span class="pre">Simulation.build_histogram()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.build_pdf"><code class="docutils literal notranslate"><span class="pre">Simulation.build_pdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.build_variances"><code class="docutils literal notranslate"><span class="pre">Simulation.build_variances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.load"><code class="docutils literal notranslate"><span class="pre">Simulation.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.plot_average"><code class="docutils literal notranslate"><span class="pre">Simulation.plot_average()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.plot_sim"><code class="docutils literal notranslate"><span class="pre">Simulation.plot_sim()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.plot_variance"><code class="docutils literal notranslate"><span class="pre">Simulation.plot_variance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.result_labels"><code class="docutils literal notranslate"><span class="pre">Simulation.result_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulation.save"><code class="docutils literal notranslate"><span class="pre">Simulation.save()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langesim.html#langesim.simulator.Simulator"><code class="docutils literal notranslate"><span class="pre">Simulator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulator.__init__"><code class="docutils literal notranslate"><span class="pre">Simulator.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulator.analyse"><code class="docutils literal notranslate"><span class="pre">Simulator.analyse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langesim.html#langesim.simulator.Simulator.run"><code class="docutils literal notranslate"><span class="pre">Simulator.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langesim.html#langesim.simulator.make_simulator"><code class="docutils literal notranslate"><span class="pre">make_simulator()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langesim.html#module-langesim">Module contents</a></li>
 </ul>
 </li>
 </ul>
