@@ -4,7 +4,7 @@ from scipy.integrate import simps
 
 def make_sampler(pdf, range=(-25, 25), bins=10000001):
     """Generates a sampler of random samples distributed with pdf
-    using the inverse transform sampling method
+    using the inverse transform sampling method.
     Adapted from:
     https://towardsdatascience.com/random-sampling-using-scipy-and-numpy-part-i-f3ce8c78812e
 
