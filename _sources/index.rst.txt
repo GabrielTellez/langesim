@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Langesim's documentation!
-====================================
+Langesim documentation
+======================
 
 **Langesim** is a python library to perform overdamped Langevin simulations of a brownian particle
 in an arbitrary time depend potential.
