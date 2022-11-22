@@ -10,7 +10,7 @@ jobs:
       - name: Build HTML
         uses: ammaraskar/sphinx-action@master
         with:
-          pre-build-command: "apt-get install -y curl && curl -sSL https://install.python-poetry.org | python && poetry install"
+          pre-build-command: "apt-get update -y && apt-get install -y curl && curl -sSL https://install.python-poetry.org | python && poetry install"
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
