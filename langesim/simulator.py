@@ -32,6 +32,14 @@ def make_simulator(
         each snapshot_step time. Defaults to 100.
         k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.
         center (float function, optional): center function of the potential. Defaults to center(t)=0.0.
+        harmonic_potential (boolean, optional): If True: the external potential
+            is harmonic with stiffness k(t) and center(t).
+            If False the external force is given by the force argument or
+            the the external potential is given by potential argument
+        force (float function(x,t), optional): the external force
+        potential (float function(x,t), optional): the external potential
+        initial_distribution (float function(), optional): initial
+            condition for x(0). Default: sampled from Bolztmann factor at time 0: exp(-U(x,0))
 
     Returns:
         njitted function: numba compiled function that performs simulations
@@ -742,16 +750,14 @@ class Simulator:
             each snapshot_step time. Defaults to 100.
             k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.
             center (float function, optional): center function of the potential. Defaults to center(t)=0.0.
-            harmonic_potential (boolean, optional): it True: the external potential
+            harmonic_potential (boolean, optional): If True: the external potential
               is harmonic with stiffness k(t) and center(t).
               If False the external force is given by the force argument or
               the the external potential is given by potential argument
             force (float function(x,t), optional): the external force
             potential (float function(x,t), optional): the external potential
             initial_distribution (float function(), optional): initial
-              condition for x(0). Default: for harmonic oscillator, sampled
-              from equilibrium distribution exp(-k(0)(x-center(0)**2/2).
-              Have to be provided for general potential if harmonic_potential=False
+              condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))
         """
         initial_distribution_not_compiled = initial_distribution
         if harmonic_potential:
@@ -815,7 +821,7 @@ class Simulator:
         )
         self.simulations_performed = 0
         # list of Simulations classes to store results of simulations
-        self.simulation = []
+        self.simulation: list[Simulation] = []
 
     def run(
         self,
