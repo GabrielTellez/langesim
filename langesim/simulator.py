@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import numpy as np
 import plotly.graph_objects as go
 import numba as nb
@@ -349,12 +350,12 @@ class Simulation:
             "delta_U": delta_U,
             "energy": energy,
         }
-        self.histogram = {}
-        self.pdf = {}
-        self.averages = {}
-        self.average_func = {}
-        self.variances = {}
-        self.variance_func = {}
+        self.histogram: dict[str, np.array] = {}
+        self.pdf: dict[str, Callable[[float, float], float]] = {}
+        self.averages: dict[str, np.array] = {}
+        self.average_func: dict[str, Callable[[float], float]] = {}
+        self.variances: dict[str, np.array] = {}
+        self.variance_func: dict[str, Callable[[float], float]] = {}
 
     def __str__(self):
         return f'Simulation "{self.name}"'
@@ -652,7 +653,7 @@ class Simulation:
     def plot_sim(
         self,
         quantity: str,
-        sim_list,
+        sim_list: list[int],
         sim_labels=None,
         t_range=None,
         y_range=None,

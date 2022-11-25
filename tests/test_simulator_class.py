@@ -162,7 +162,7 @@ def test_fail_analyse_nonexistent_simulation():
         simulator.analyse()
 
 
-def test_constant_force_without_force_or_potential():
+def test_non_harmonic_simulator_without_force_and_potential():
     with pytest.raises(ValueError):
         # Should raise an error if the force and the potential are not provided
         simulator = Simulator(harmonic_potential=False)
