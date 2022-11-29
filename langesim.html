@@ -43,7 +43,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">langesim</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">langesim package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#langesim-simulator-module">langesim.simulator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-langesim.simulator">langesim.simulator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#langesim.simulator.Simulation"><code class="docutils literal notranslate"><span class="pre">Simulation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#langesim.simulator.Simulator"><code class="docutils literal notranslate"><span class="pre">Simulator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#langesim.simulator.make_simulator"><code class="docutils literal notranslate"><span class="pre">make_simulator()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-langesim.graphic_utilities">langesim.graphic_utilities module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#langesim.graphic_utilities.animate_simulation"><code class="docutils literal notranslate"><span class="pre">animate_simulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#langesim.graphic_utilities.plot_quantity"><code class="docutils literal notranslate"><span class="pre">plot_quantity()</span></code></a></li>
@@ -53,7 +58,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#langesim.sampler.make_sampler"><code class="docutils literal notranslate"><span class="pre">make_sampler()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-langesim">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -90,8 +95,383 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </div>
-<div class="section" id="langesim-simulator-module">
-<h2>langesim.simulator module<a class="headerlink" href="#langesim-simulator-module" title="Permalink to this heading"></a></h2>
+<div class="section" id="module-langesim.simulator">
+<span id="langesim-simulator-module"></span><h2>langesim.simulator module<a class="headerlink" href="#module-langesim.simulator" title="Permalink to this heading"></a></h2>
+<p>Simulator and Simulation classes</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">langesim.simulator.</span></span><span class="sig-name descname"><span class="pre">Simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stores simulation parameters and results.
+Analyses the results: builds PDF of the simulation results (position,
+work, etc..)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the Simulation class with parameters and raw results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tot_sims</strong> (<em>int</em>) – total number of simulations.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – time step.</p></li>
+<li><p><strong>tot_steps</strong> (<em>int</em>) – number of steps of each simulation.</p></li>
+<li><p><strong>noise_scaler</strong> (<em>float</em>) – brownian noise scale k_B T. Defaults to 1.0.</p></li>
+<li><p><strong>snapshot_step</strong> (<em>int</em>) – a snapshot of simulation has been saved each snapshot_step time.</p></li>
+<li><p><strong>k</strong> (<em>float function</em>) – stiffness of the potential</p></li>
+<li><p><strong>center</strong> (<em>float function</em>) – center of the potential</p></li>
+<li><p><strong>results</strong> (<em>tuple</em>) – <p>results in the form (times, x, power, work, heat, delta_U, energy) where:</p>
+<dl class="simple">
+<dt>times (ndarray):</dt><dd><p>ndarray of times where snapshot where taken.</p>
+</dd>
+<dt>x (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>x[sim][ts] is the position of the brownian particle in simulation number num and snapshot ts</p>
+</dd>
+<dt>power (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>power[sim][ts] is the power into the system at snapshot ts and simulation sim</p>
+</dd>
+<dt>work (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>work[sim][ts] is the work perfomed into the system in simulation sim up to snapshot ts</p>
+</dd>
+<dt>heat (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>heat[sim][ts] into the system in simulation sim up to snapshot ts</p>
+</dd>
+<dt>delta_U (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>delta_U[sim][ts] is the energy difference between snapshot = 0 and current snapshot ts in
+simulation sim</p>
+</dd>
+<dt>energy (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>energy[sim][ts] in simulation sim at snapshot ts</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>name</strong> (<em>string</em><em>, </em><em>optional</em>) – name of the simulation</p></li>
+<li><p><strong>harmonic_potential</strong> (<em>boolean</em><em>, </em><em>optional</em>) – True if the potential is harmonic</p></li>
+<li><p><strong>force</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – force when the potential
+is not harmonic</p></li>
+<li><p><strong>potential</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – potential when the potential
+is not harmonic</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.analyse">
+<span class="sig-name descname"><span class="pre">analyse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.analyse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.analyse" title="Permalink to this definition"></a></dt>
+<dd><p>Builds all histograms, PDF, averages and variances</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.animate_pdf">
+<span class="sig-name descname"><span class="pre">animate_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[-3.0,</span> <span class="pre">3.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_x_eq_distrib</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.animate_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.animate_pdf" title="Permalink to this definition"></a></dt>
+<dd><p>Shows an animation of the evolution of the PDF of a quantity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>string</em>) – quantity to animate its PDF. Must be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>x_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the quantity in the PDF. Defaults to [-3.0, 3.0].</p></li>
+<li><p><strong>y_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the PDF value. Defaults to [0, 1.5].</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins for the histogram. Defaults to 300.</p></li>
+<li><p><strong>show_x_eq_distrib</strong> (<em>boolean</em><em>, </em><em>optional</em>) – if True the instantaneous</p></li>
+<li><p><strong>None.</strong> (<em>equilibrium position distribution is shown. Defaults to</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>animation of the PDF</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>plotly.graph_objects.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.build_averages">
+<span class="sig-name descname"><span class="pre">build_averages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_averages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_averages" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the average of a quantity.
+The average at time t (with corresponding time_index of the snapshot)
+is stored in averages[quantity][time_index]
+A function giving the average as a function of time is created and
+stored in average_func(quantity)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>quantity</strong> (<em>string</em>) – quantity to build its averages. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.build_histogram">
+<span class="sig-name descname"><span class="pre">build_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_histogram" title="Permalink to this definition"></a></dt>
+<dd><p>Builds the histogram of a quantity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>string</em>) – quantity to build its histogram. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins for the histogram. Defaults to 300.</p></li>
+<li><p><strong>q_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the quantity. Defaults to</p></li>
+<li><p><strong>Warning</strong> (<em>None for automatic range.</em>) – not using automatic range can</p></li>
+<li><p><strong>outliers.</strong> (<em>introduce bugs in the histograms if there are</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.build_pdf">
+<span class="sig-name descname"><span class="pre">build_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_pdf" title="Permalink to this definition"></a></dt>
+<dd><p>Builds the probability density function (PDF) for a quantity.
+The PDF is build and function is defined to access it in self.pdf(quantity)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>quantity</strong> (<em>string</em>) – quantity to build its pdf. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.build_variances">
+<span class="sig-name descname"><span class="pre">build_variances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_variances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_variances" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the variance of a quantity.
+The variance at time t (with corresponding time_index of the snapshot)
+is stored in variances[quantity][time_index]
+A function giving the variance as a function of time is created and
+stored in variance_func(quantity)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>quantity</strong> (<em>string</em>) – quantity to build its variances. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.load" title="Permalink to this definition"></a></dt>
+<dd><p>Loads a simulation from file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – filename of the simulation to load</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the loaded simulation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#langesim.simulator.Simulation" title="langesim.simulator.Simulation">Simulation</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.plot_average">
+<span class="sig-name descname"><span class="pre">plot_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.plot_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.plot_average" title="Permalink to this definition"></a></dt>
+<dd><p>Plots &lt;quantity&gt; as a function of time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>string</em>) – quantity to plot. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>t_array</strong> (<em>np.array</em>) – time axis array</p></li>
+<li><p><strong>y_array</strong> (<em>np.array</em>) – quantity to plot array</p></li>
+<li><p><strong>t_range</strong> (<em>list</em><em>, </em><em>optional</em>) – t range. Defaults to Autoscale.</p></li>
+<li><p><strong>y_range</strong> (<em>list</em><em>, </em><em>optional</em>) – y range. Defaults to Autoscale.</p></li>
+<li><p><strong>t_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for t axis. Defaults to ‘t’.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for y axis. Defaults to ‘’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>plot of the quantity</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>plotly.graph_objects.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.plot_sim">
+<span class="sig-name descname"><span class="pre">plot_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.plot_sim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.plot_sim" title="Permalink to this definition"></a></dt>
+<dd><p>Plots quantity as a function of time for simulations listed in sim_list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>str</em>) – quantity to plot. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>sim_list</strong> (<em>list</em><em> of </em><em>int</em>) – list of the simulation numbers to plot.</p></li>
+<li><p><strong>sim_labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – list of labels for each
+trace in the plot. Defaults to None.</p></li>
+<li><p><strong>t_array</strong> (<em>np.array</em>) – time axis array</p></li>
+<li><p><strong>y_array</strong> (<em>np.array</em>) – quantity to plot array</p></li>
+<li><p><strong>t_range</strong> (<em>list</em><em>, </em><em>optional</em>) – t range. Defaults to Autoscale.</p></li>
+<li><p><strong>y_range</strong> (<em>list</em><em>, </em><em>optional</em>) – y range. Defaults to Autoscale.</p></li>
+<li><p><strong>t_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for t axis. Defaults to ‘t’.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for y axis. Defaults to ‘’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>plot of the quantity</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>plotly.graph_objects.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.plot_variance">
+<span class="sig-name descname"><span class="pre">plot_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.plot_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.plot_variance" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the variance of quantity as a function of time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>string</em>) – quantity to plot. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>t_array</strong> (<em>np.array</em>) – time axis array</p></li>
+<li><p><strong>y_array</strong> (<em>np.array</em>) – quantity to plot array</p></li>
+<li><p><strong>t_range</strong> (<em>list</em><em>, </em><em>optional</em>) – t range. Defaults to Autoscale.</p></li>
+<li><p><strong>y_range</strong> (<em>list</em><em>, </em><em>optional</em>) – y range. Defaults to Autoscale.</p></li>
+<li><p><strong>t_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for t axis. Defaults to ‘t’.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for y axis. Defaults to ‘’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>plot of the quantity</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>plotly.graph_objects.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.result_labels">
+<span class="sig-name descname"><span class="pre">result_labels</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['x',</span> <span class="pre">'power',</span> <span class="pre">'work',</span> <span class="pre">'heat',</span> <span class="pre">'delta_U',</span> <span class="pre">'energy']</span></em><a class="headerlink" href="#langesim.simulator.Simulation.result_labels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.save" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – filename where the simulation is saved</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">langesim.simulator.</span></span><span class="sig-name descname"><span class="pre">Simulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Simulator class for Langevin dynamics of a harmonic oscillator with
+variable potential. Encapsulates the simulator, perform
+simulations, analyses them and store results
+of simulation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulator.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the Simulator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tot_sims</strong> (<em>int</em><em>, </em><em>optional</em>) – total number of simulations. Defaults to 1000.</p></li>
+<li><p><strong>dt</strong> (<em>float</em><em>, </em><em>optional</em>) – time step. Defaults to 0.001.</p></li>
+<li><p><strong>tot_steps</strong> (<em>int</em><em>, </em><em>optional</em>) – total steps of each simulation. Defaults to 10000.</p></li>
+<li><p><strong>noise_scaler</strong> (<em>float</em><em>, </em><em>optional</em>) – brownian noise scale k_B T. Defaults to 1.0.</p></li>
+<li><p><strong>snapshot_step</strong> (<em>int</em><em>, </em><em>optional</em>) – save a snapshot of simulation at</p></li>
+<li><p><strong>100.</strong> (<em>each snapshot_step time. Defaults to</em>) – </p></li>
+<li><p><strong>k</strong> (<em>float function</em><em>, </em><em>optional</em>) – stiffness function k(t) of the potential. Defaults to k(t)=1.0.</p></li>
+<li><p><strong>center</strong> (<em>float function</em><em>, </em><em>optional</em>) – center function of the potential. Defaults to center(t)=0.0.</p></li>
+<li><p><strong>harmonic_potential</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True: the external potential
+is harmonic with stiffness k(t) and center(t).
+If False the external force is given by the force argument or
+the the external potential is given by potential argument</p></li>
+<li><p><strong>force</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – the external force</p></li>
+<li><p><strong>potential</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – the external potential</p></li>
+<li><p><strong>initial_distribution</strong> (<em>float function</em><em>(</em><em>)</em><em>, </em><em>optional</em>) – initial
+condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.analyse">
+<span class="sig-name descname"><span class="pre">analyse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulator.analyse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulator.analyse" title="Permalink to this definition"></a></dt>
+<dd><p>Performs the analysis of simulation number sim_num</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sim_num</strong> (<em>int</em><em>, </em><em>optional</em>) – simulation number. Defaults to last simulation performed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulator.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulator.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs a simulation and store the results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tot_sims</strong> (<em>int</em><em>, </em><em>optional</em>) – total number of simulations.</p></li>
+<li><p><strong>dt</strong> (<em>float</em><em>, </em><em>optional</em>) – time step.</p></li>
+<li><p><strong>tot_steps</strong> (<em>int</em><em>, </em><em>optional</em>) – total steps of each simulation.</p></li>
+<li><p><strong>noise_scaler</strong> (<em>float</em><em>, </em><em>optional</em>) – brownian noise scale k_B T.</p></li>
+<li><p><strong>snapshot_step</strong> (<em>int</em><em>, </em><em>optional</em>) – save a snapshot of simulation at
+each snapshot_step time.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name of the simulation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langesim.simulator.make_simulator">
+<span class="sig-prename descclassname"><span class="pre">langesim.simulator.</span></span><span class="sig-name descname"><span class="pre">make_simulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#make_simulator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.make_simulator" title="Permalink to this definition"></a></dt>
+<dd><p>Makes a numba compiled njit langevin simulator of a brownian
+particle in an external time variable potential or force</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tot_sims</strong> (<em>int</em><em>, </em><em>optional</em>) – default total number of simulations. Defaults to 1000.</p></li>
+<li><p><strong>dt</strong> (<em>float</em><em>, </em><em>optional</em>) – default time step. Defaults to 0.001.</p></li>
+<li><p><strong>tot_steps</strong> (<em>int</em><em>, </em><em>optional</em>) – default number of steps of each simulation. Defaults to 10000.</p></li>
+<li><p><strong>noise_scaler</strong> (<em>float</em><em>, </em><em>optional</em>) – brownian noise scale k_B T. Defaults to 1.0.</p></li>
+<li><p><strong>snapshot_step</strong> (<em>int</em><em>, </em><em>optional</em>) – save a snapshot of simulation at</p></li>
+<li><p><strong>100.</strong> (<em>each snapshot_step time. Defaults to</em>) – </p></li>
+<li><p><strong>k</strong> (<em>float function</em><em>, </em><em>optional</em>) – stiffness function k(t) of the potential. Defaults to k(t)=1.0.</p></li>
+<li><p><strong>center</strong> (<em>float function</em><em>, </em><em>optional</em>) – center function of the potential. Defaults to center(t)=0.0.</p></li>
+<li><p><strong>harmonic_potential</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True: the external potential
+is harmonic with stiffness k(t) and center(t).
+If False the external force is given by the force argument or
+the the external potential is given by potential argument</p></li>
+<li><p><strong>force</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – the external force</p></li>
+<li><p><strong>potential</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – the external potential</p></li>
+<li><p><strong>initial_distribution</strong> (<em>float function</em><em>(</em><em>)</em><em>, </em><em>optional</em>) – initial
+condition for x(0). Default: sampled from Bolztmann factor at time 0: exp(-U(x,0))</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>numba compiled function that performs simulations</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>njitted function</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-langesim.graphic_utilities">
 <span id="langesim-graphic-utilities-module"></span><h2>langesim.graphic_utilities module<a class="headerlink" href="#module-langesim.graphic_utilities" title="Permalink to this heading"></a></h2>
@@ -191,8 +571,8 @@ provide random numbers distributed with the given pdf.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<div class="section" id="module-langesim">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-langesim" title="Permalink to this heading"></a></h2>
 </div>
 </div>
 
