@@ -1,3 +1,5 @@
+"""Simulator and Simulation classes 
+"""
 from collections.abc import Callable
 import numpy as np
 import plotly.graph_objects as go
@@ -82,7 +84,7 @@ def make_simulator(
                 """Samples initial position according to the equilibrium distribution
 
                 Returns:
-                    float: x random sample distributed according to exp(-k(0)*(x-center(0)**2/2))
+                    float: x random sample distributed according to exp(-k(0)*(x-center(0))**2/2)
                 """
                 return np.random.normal(center(0.0), scale=np.sqrt(1.0 / k(0.0)))
 

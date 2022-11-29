@@ -1,20 +1,25 @@
+"""Sampler to generate random samples distributed according to a given arbitrary
+probability density function (pdf). It uses the inverse transform sampling method.
+
+Adapted from:
+
+    https://towardsdatascience.com/random-sampling-using-scipy-and-numpy-part-i-f3ce8c78812e
+"""
+
 import numpy as np
 from scipy.integrate import simps
 
 
-def make_sampler(pdf, range=(-25, 25), bins=10000001):
+def make_sampler(pdf, range=(-25, 25), bins=1_000_000):
     """Generates a sampler of random samples distributed with pdf
     using the inverse transform sampling method.
-    Adapted from:
-    https://towardsdatascience.com/random-sampling-using-scipy-and-numpy-part-i-f3ce8c78812e
-
 
     Args:
         pdf (function(x)): probability density function to draw the
             samples. Does not need to be normalized
         range (tuple, optional): range for the random variable values. Defaults to (-25,25).
         bins (int, optional): bins to build the discretized inverse
-            cumulative distribution function. Defaults to 10000001.
+            cumulative distribution function. Defaults to 1 000 000.
 
     Returns:
         sampler_single, sampler_multi (tuple of functions): samplers that

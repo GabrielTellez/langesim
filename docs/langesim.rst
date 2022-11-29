@@ -4,6 +4,14 @@ langesim package
 Submodules
 ----------
 
+langesim.simulator module
+-------------------------
+
+.. automodule:: langesim.simulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 langesim.graphic\_utilities module
 ----------------------------------
 
@@ -16,14 +24,6 @@ langesim.sampler module
 -----------------------
 
 .. automodule:: langesim.sampler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-langesim.simulator module
--------------------------
-
-.. automodule:: langesim.simulator
    :members:
    :undoc-members:
    :show-inheritance:

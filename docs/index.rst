@@ -13,6 +13,7 @@ in an arbitrary time depend potential.
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    modules
 
 Indices and tables
