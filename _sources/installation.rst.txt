@@ -3,9 +3,9 @@ Installation
 
 1. Clone the *langesim* repository
 
-.. code-block:: console
+    .. code-block:: console
 
-    git clone https://github.com/GabrielTellez/langesim.git
+        git clone https://github.com/GabrielTellez/langesim.git
 
 2. To install the package you have two options: install with poetry or with pip.
    First, enter the top directory of the package 
@@ -28,11 +28,11 @@ Installation
         python -m venv .langesim_env 
         
         # Activate environment: 
-        # for bash shell
+        # bash shell
         source .langesim_env/bin/activate
-        # or for windows cmd
+        # or windows cmd
         .langesim_env\Scripts\activate.bat
-        # or for windows powershell
+        # or windows powershell
         .langesim_env\Scripts\activate.ps1
 
         pip install .
