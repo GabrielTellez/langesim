@@ -1,6 +1,7 @@
 """Simulator and Simulation classes 
 """
-from collections.abc import Callable
+from collections.abc import Callable 
+from typing import List 
 import numpy as np
 import plotly.graph_objects as go
 import numba as nb
@@ -655,7 +656,7 @@ class Simulation:
     def plot_sim(
         self,
         quantity: str,
-        sim_list: list[int],
+        sim_list: List[int],
         sim_labels=None,
         t_range=None,
         y_range=None,
@@ -824,7 +825,7 @@ class Simulator:
         )
         self.simulations_performed = 0
         # list of Simulations classes to store results of simulations
-        self.simulation: list[Simulation] = []
+        self.simulation: List[Simulation] = []
 
     def run(
         self,
