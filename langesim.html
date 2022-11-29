@@ -44,8 +44,15 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">langesim package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#langesim-simulator-module">langesim.simulator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#langesim-graphic-utilities-module">langesim.graphic_utilities module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#langesim-sampler-module">langesim.sampler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-langesim.graphic_utilities">langesim.graphic_utilities module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#langesim.graphic_utilities.animate_simulation"><code class="docutils literal notranslate"><span class="pre">animate_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#langesim.graphic_utilities.plot_quantity"><code class="docutils literal notranslate"><span class="pre">plot_quantity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-langesim.sampler">langesim.sampler module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#langesim.sampler.make_sampler"><code class="docutils literal notranslate"><span class="pre">make_sampler()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
@@ -86,11 +93,103 @@
 <div class="section" id="langesim-simulator-module">
 <h2>langesim.simulator module<a class="headerlink" href="#langesim-simulator-module" title="Permalink to this heading"></a></h2>
 </div>
-<div class="section" id="langesim-graphic-utilities-module">
-<h2>langesim.graphic_utilities module<a class="headerlink" href="#langesim-graphic-utilities-module" title="Permalink to this heading"></a></h2>
+<div class="section" id="module-langesim.graphic_utilities">
+<span id="langesim-graphic-utilities-module"></span><h2>langesim.graphic_utilities module<a class="headerlink" href="#module-langesim.graphic_utilities" title="Permalink to this heading"></a></h2>
+<p>Graphics utilities to plot the simulations results.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="langesim.graphic_utilities.animate_simulation">
+<span class="sig-prename descclassname"><span class="pre">langesim.graphic_utilities.</span></span><span class="sig-name descname"><span class="pre">animate_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[-3.0,</span> <span class="pre">6.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'P(x,t)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_x_eq_distrib</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/graphic_utilities.html#animate_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.graphic_utilities.animate_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Plot and animates a simulation data results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>times</strong> (<em>list</em><em> of </em><em>float</em>) – list of times where snapshots where taken</p></li>
+<li><p><strong>xst</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>float</em>) – list of snapshots of many
+simulations. Should have shape (tot_sims, tot_snapshots)</p></li>
+<li><p><strong>x_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range of the data to plot. Defaults to [-3.0, 6.0].</p></li>
+<li><p><strong>y_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range of the histogram of xst. Defaults to [0, 1.5].</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins to compute histogram of xst. Defaults to 300.</p></li>
+<li><p><strong>x_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for xst in the plot. Defaults to ‘x’.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for the probability density of xst. Defaults to ‘P(x,t)’.</p></li>
+<li><p><strong>show_x_eq_distrib</strong> (<em>bool</em><em>, </em><em>optional</em>) – show the equilibrium
+distribution corresponding to a harmonic oscilator with center(t)
+and stiffness k(t). Defaults to True.</p></li>
+<li><p><strong>k</strong> (<em>float function</em><em>, </em><em>optional</em>) – stiffness function of the potential. Defaults to k(t)=1.0.</p></li>
+<li><p><strong>center</strong> (<em>float function</em><em>, </em><em>optional</em>) – center function of the potential. Defaults to center(t)=0.0.</p></li>
+<li><p><strong>harmonic_potential</strong> – True if working with a harmonic potential</p></li>
+<li><p><strong>potential</strong> – potential energy to use when harmonic_potential=False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>animation of the simulation data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>plotly.graph_objects.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langesim.graphic_utilities.plot_quantity">
+<span class="sig-prename descclassname"><span class="pre">langesim.graphic_utilities.</span></span><span class="sig-name descname"><span class="pre">plot_quantity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/graphic_utilities.html#plot_quantity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.graphic_utilities.plot_quantity" title="Permalink to this definition"></a></dt>
+<dd><p>Plots y_array as function of t_array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t_array</strong> (<em>np.array</em>) – time axis array of</p></li>
+<li><p><strong>y_array</strong> (<em>np.array</em>) – quantity to plot array</p></li>
+<li><p><strong>t_range</strong> (<em>list</em><em>, </em><em>optional</em>) – t range. Defaults to Autoscale.</p></li>
+<li><p><strong>y_range</strong> (<em>list</em><em>, </em><em>optional</em>) – y range. Defaults to Autoscale.</p></li>
+<li><p><strong>t_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for t axis. Defaults to ‘t’.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for y axis. Defaults to ‘’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the plot of the quantity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>plotly.graph_objects.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
-<div class="section" id="langesim-sampler-module">
-<h2>langesim.sampler module<a class="headerlink" href="#langesim-sampler-module" title="Permalink to this heading"></a></h2>
+<div class="section" id="module-langesim.sampler">
+<span id="langesim-sampler-module"></span><h2>langesim.sampler module<a class="headerlink" href="#module-langesim.sampler" title="Permalink to this heading"></a></h2>
+<p>Sampler to generate random samples distributed according to a given arbitrary
+probability density function (pdf). It uses the inverse transform sampling method.</p>
+<p>Adapted from:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://towardsdatascience.com/random-sampling-using-scipy-and-numpy-part-i-f3ce8c78812e">https://towardsdatascience.com/random-sampling-using-scipy-and-numpy-part-i-f3ce8c78812e</a></p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="langesim.sampler.make_sampler">
+<span class="sig-prename descclassname"><span class="pre">langesim.sampler.</span></span><span class="sig-name descname"><span class="pre">make_sampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-25,</span> <span class="pre">25)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/sampler.html#make_sampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.sampler.make_sampler" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a sampler of random samples distributed with pdf
+using the inverse transform sampling method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf</strong> (<em>function</em><em>(</em><em>x</em><em>)</em>) – probability density function to draw the
+samples. Does not need to be normalized</p></li>
+<li><p><strong>range</strong> (<em>tuple</em><em>, </em><em>optional</em>) – range for the random variable values. Defaults to (-25,25).</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins to build the discretized inverse
+cumulative distribution function. Defaults to 1 000 000.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>samplers that
+provide random numbers distributed with the given pdf.</p>
+<p>sampler_single() returns one single value.</p>
+<p>sampler_multi(n) return n random values.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sampler_single, sampler_multi (tuple of functions)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-contents">
 <h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
