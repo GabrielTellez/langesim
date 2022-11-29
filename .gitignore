@@ -1,6 +1,6 @@
 tmp/
 .vscode/
-
+.langesim_env/
 
 
 # Python specific .gitignore
