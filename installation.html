@@ -91,9 +91,18 @@ First, enter the top directory of the package</p>
 </div>
 <ul class="simple">
 <li><p>Otherwise, pip can be used to install the package. Create a virtual
-environment, then install with pip:</p></li>
+environment, activate it, then install with pip:</p></li>
 </ul>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m venv langesim_env</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m venv .langesim_env</span>
+
+<span class="gp"># </span>Activate environment:
+<span class="gp"># </span><span class="k">for</span> bash shell
+<span class="go">source .langesim_env/bin/activate</span>
+<span class="gp"># </span>or <span class="k">for</span> windows cmd
+<span class="go">.langesim_env\Scripts\activate.bat</span>
+<span class="gp"># </span>or <span class="k">for</span> windows powershell
+<span class="go">.langesim_env\Scripts\activate.ps1</span>
+
 <span class="go">pip install .</span>
 </pre></div>
 </div>

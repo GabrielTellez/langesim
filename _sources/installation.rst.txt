@@ -21,11 +21,20 @@ Installation
         poetry install
 
     - Otherwise, pip can be used to install the package. Create a virtual
-      environment, then install with pip:
+      environment, activate it, then install with pip:
 
     .. code-block:: console
 
-        python -m venv langesim_env 
+        python -m venv .langesim_env 
+        
+        # Activate environment: 
+        # for bash shell
+        source .langesim_env/bin/activate
+        # or for windows cmd
+        .langesim_env\Scripts\activate.bat
+        # or for windows powershell
+        .langesim_env\Scripts\activate.ps1
+
         pip install .
 
 
