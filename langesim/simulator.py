@@ -1,7 +1,7 @@
 """Simulator and Simulation classes 
 """
-from collections.abc import Callable 
-from typing import List 
+from collections.abc import Callable
+from typing import List
 import numpy as np
 import plotly.graph_objects as go
 import numba as nb
@@ -300,29 +300,29 @@ class Simulation:
             k (float function): stiffness of the potential
             center (float function): center of the potential
             results (tuple): results in the form (times, x, power, work, heat, delta_U, energy) where:
-            
-                times (ndarray): 
+
+                times (ndarray):
                     ndarray of times where snapshot where taken.
-            
-                x (ndarray of shape (tot_sims, tot_snapshots)): 
+
+                x (ndarray of shape (tot_sims, tot_snapshots)):
                     x[sim][ts] is the position of the brownian particle in simulation number num and snapshot ts
 
-                power (ndarray of shape (tot_sims, tot_snapshots)): 
+                power (ndarray of shape (tot_sims, tot_snapshots)):
                     power[sim][ts] is the power into the system at snapshot ts and simulation sim
-                
-                work (ndarray of shape (tot_sims, tot_snapshots)): 
+
+                work (ndarray of shape (tot_sims, tot_snapshots)):
                     work[sim][ts] is the work perfomed into the system in simulation sim up to snapshot ts
-                
-                heat (ndarray of shape (tot_sims, tot_snapshots)): 
+
+                heat (ndarray of shape (tot_sims, tot_snapshots)):
                     heat[sim][ts] into the system in simulation sim up to snapshot ts
-            
-                delta_U (ndarray of shape (tot_sims, tot_snapshots)): 
+
+                delta_U (ndarray of shape (tot_sims, tot_snapshots)):
                     delta_U[sim][ts] is the energy difference between snapshot = 0 and current snapshot ts in
                     simulation sim
-                
+
                 energy (ndarray of shape (tot_sims, tot_snapshots)):
                     energy[sim][ts] in simulation sim at snapshot ts
-            
+
             name (string, optional): name of the simulation
             harmonic_potential(boolean, optional): True if the potential is harmonic
             force (float function(x,t), optional): force when the potential

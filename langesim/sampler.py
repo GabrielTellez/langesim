@@ -24,9 +24,9 @@ def make_sampler(pdf, range=(-25, 25), bins=1_000_000):
     Returns:
         sampler_single, sampler_multi (tuple of functions): samplers that
         provide random numbers distributed with the given pdf.
-        
+
         sampler_single() returns one single value.
-        
+
         sampler_multi(n) return n random values.
     """
 

@@ -64,8 +64,7 @@ def animate_simulation(
     xx = np.linspace(*x_range, num_points)
     # range should be automatic (default) for histograms or bug with outliers
     histos = [
-        np.histogram(xst[:, ti], density=True, bins=bins)
-        for ti in range(0, len(times))
+        np.histogram(xst[:, ti], density=True, bins=bins) for ti in range(0, len(times))
     ]
     if harmonic_potential:
         b = [
@@ -76,10 +75,11 @@ def animate_simulation(
         # Un-normalized Boltzmann factor
         def expU(x, t):
             return np.exp(-potential(x, t))
+
         # Normalize the PDF
         def expUnorm(x, t):
-            Z = quad(expU, -np.inf, np.inf, args = (t,))[0]
-            return expU(x,t) / Z
+            Z = quad(expU, -np.inf, np.inf, args=(t,))[0]
+            return expU(x, t) / Z
 
         b = [expUnorm(xx, t) for t in times]
 
