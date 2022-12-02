@@ -19,6 +19,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'nbsphinx',
+#    'myst_nb',
     ]
 
 templates_path = ['_templates']
@@ -37,7 +38,7 @@ autodoc_default_options = {
     'special-members': '__init__',
 }
 
-html_js_files = [
-    "require.min.js",  # Add to your _static
-    "custom.js",
-]
+# html_js_files = [
+#     "require.min.js",  # Add to your _static
+#     "custom.js",
+# ]
