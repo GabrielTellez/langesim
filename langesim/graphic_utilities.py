@@ -2,6 +2,7 @@
 """
 import numpy as np
 import plotly.graph_objects as go
+from scipy.integrate import quad
 
 
 def animate_simulation(
@@ -73,12 +74,15 @@ def animate_simulation(
         ]
     else:
         # Un-normalized Boltzmann factor
-        b = [np.exp(-potential(xx, t)) for t in times]
+        def expU(x, t):
+            return np.exp(-potential(x, t))
         # Normalize the PDF
-        norm = np.linalg.norm(b, axis=1, ord=1)
-        dx = np.abs(x_range[1] - x_range[0]) / num_points
-        norm = norm * dx
-        b = b / norm[:, None]
+        def expUnorm(x, t):
+            Z = quad(expU, -np.inf, np.inf, args = (t,))[0]
+            return expU(x,t) / Z
+
+        b = [expUnorm(xx, t) for t in times]
+
     # make figure
     fig_dict = {"data": [], "layout": {}, "frames": []}
     fig_dict["layout"] = go.Layout(

@@ -14,6 +14,7 @@ in an arbitrary time depend potential.
    :caption: Contents:
 
    installation
+   usage 
    modules
 
 Indices and tables
