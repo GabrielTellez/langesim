@@ -1,8 +1,5 @@
-langesim package
+Langesim package
 ================
-
-Submodules
-----------
 
 langesim.simulator module
 -------------------------
@@ -28,10 +25,3 @@ langesim.sampler module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: langesim
-   :members:
-   :undoc-members:
-   :show-inheritance:

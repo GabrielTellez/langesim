@@ -10,7 +10,7 @@ Langesim documentation
 in an arbitrary time depend potential.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    installation

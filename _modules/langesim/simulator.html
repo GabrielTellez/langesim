@@ -40,8 +40,8 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html"><em>Langesim</em> basic usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">langesim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Reference guide</a></li>
 </ul>
 
         </div>
@@ -71,8 +71,8 @@
   <h1>Source code for langesim.simulator</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Simulator and Simulation classes </span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span> 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span> 
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
 <span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
@@ -371,29 +371,29 @@
 <span class="sd">            k (float function): stiffness of the potential</span>
 <span class="sd">            center (float function): center of the potential</span>
 <span class="sd">            results (tuple): results in the form (times, x, power, work, heat, delta_U, energy) where:</span>
-<span class="sd">            </span>
-<span class="sd">                times (ndarray): </span>
+
+<span class="sd">                times (ndarray):</span>
 <span class="sd">                    ndarray of times where snapshot where taken.</span>
-<span class="sd">            </span>
-<span class="sd">                x (ndarray of shape (tot_sims, tot_snapshots)): </span>
+
+<span class="sd">                x (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    x[sim][ts] is the position of the brownian particle in simulation number num and snapshot ts</span>
 
-<span class="sd">                power (ndarray of shape (tot_sims, tot_snapshots)): </span>
+<span class="sd">                power (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    power[sim][ts] is the power into the system at snapshot ts and simulation sim</span>
-<span class="sd">                </span>
-<span class="sd">                work (ndarray of shape (tot_sims, tot_snapshots)): </span>
+
+<span class="sd">                work (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    work[sim][ts] is the work perfomed into the system in simulation sim up to snapshot ts</span>
-<span class="sd">                </span>
-<span class="sd">                heat (ndarray of shape (tot_sims, tot_snapshots)): </span>
+
+<span class="sd">                heat (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    heat[sim][ts] into the system in simulation sim up to snapshot ts</span>
-<span class="sd">            </span>
-<span class="sd">                delta_U (ndarray of shape (tot_sims, tot_snapshots)): </span>
+
+<span class="sd">                delta_U (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    delta_U[sim][ts] is the energy difference between snapshot = 0 and current snapshot ts in</span>
 <span class="sd">                    simulation sim</span>
-<span class="sd">                </span>
+
 <span class="sd">                energy (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    energy[sim][ts] in simulation sim at snapshot ts</span>
-<span class="sd">            </span>
+
 <span class="sd">            name (string, optional): name of the simulation</span>
 <span class="sd">            harmonic_potential(boolean, optional): True if the potential is harmonic</span>
 <span class="sd">            force (float function(x,t), optional): force when the potential</span>
@@ -440,9 +440,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            quantity (string): quantity to build its histogram. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
 <span class="sd">            bins (int, optional): bins for the histogram. Defaults to 300.</span>
-<span class="sd">            q_range (list, optional): range for the quantity. Defaults to</span>
-<span class="sd">            None for automatic range. Warning: not using automatic range can</span>
-<span class="sd">            introduce bugs in the histograms if there are outliers.</span>
+<span class="sd">            q_range (list, optional): range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

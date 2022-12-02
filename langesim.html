@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>langesim package &mdash; Langesim 0.1.0 documentation</title>
+  <title>Langesim package &mdash; Langesim 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="langesim" href="modules.html" /> 
+    <link rel="prev" title="Reference guide" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,10 +41,9 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html"><em>Langesim</em> basic usage</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">langesim</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">langesim package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Basic usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Reference guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Langesim package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-langesim.simulator">langesim.simulator module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#langesim.simulator.Simulation"><code class="docutils literal notranslate"><span class="pre">Simulation</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#langesim.simulator.Simulator"><code class="docutils literal notranslate"><span class="pre">Simulator</span></code></a></li>
@@ -60,7 +59,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#langesim.sampler.make_sampler"><code class="docutils literal notranslate"><span class="pre">make_sampler()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-langesim">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -81,8 +79,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">langesim</a></li>
-      <li class="breadcrumb-item active">langesim package</li>
+          <li class="breadcrumb-item"><a href="modules.html">Reference guide</a></li>
+      <li class="breadcrumb-item active">Langesim package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/langesim.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -117,10 +115,7 @@
 }
 </style>
 <div class="section" id="langesim-package">
-<h1>langesim package<a class="headerlink" href="#langesim-package" title="Permalink to this heading"></a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</div>
+<h1>Langesim package<a class="headerlink" href="#langesim-package" title="Permalink to this heading"></a></h1>
 <div class="section" id="module-langesim.simulator">
 <span id="langesim-simulator-module"></span><h2>langesim.simulator module<a class="headerlink" href="#module-langesim.simulator" title="Permalink to this heading"></a></h2>
 <p>Simulator and Simulation classes</p>
@@ -235,9 +230,7 @@ stored in average_func(quantity)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>quantity</strong> (<em>string</em>) – quantity to build its histogram. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
 <li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins for the histogram. Defaults to 300.</p></li>
-<li><p><strong>q_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the quantity. Defaults to</p></li>
-<li><p><strong>Warning</strong> (<em>None for automatic range.</em>) – not using automatic range can</p></li>
-<li><p><strong>outliers.</strong> (<em>introduce bugs in the histograms if there are</em>) – </p></li>
+<li><p><strong>q_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</p></li>
 </ul>
 </dd>
 </dl>
@@ -597,16 +590,13 @@ provide random numbers distributed with the given pdf.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-langesim">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-langesim" title="Permalink to this heading"></a></h2>
-</div>
 </div>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-left" title="langesim" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="Reference guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
