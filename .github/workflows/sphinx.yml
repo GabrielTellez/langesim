@@ -10,7 +10,7 @@ jobs:
       - name: Build HTML
         uses: ammaraskar/sphinx-action@master
         with:
-          pre-build-command: "/usr/local/bin/python -m pip install --upgrade pip && pip install -e ."
+          pre-build-command: "apt-get update && apt-get install pandoc && /usr/local/bin/python -m pip install --upgrade pip && pip install -e ."
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
