@@ -194,7 +194,7 @@ def plot_quantity(
     """Plots y_array as function of t_array
 
     Args:
-        t_array (np.array): time axis array of
+        t_array (np.array): time axis array
         y_array (np.array): quantity to plot array
         t_range (list, optional): t range. Defaults to Autoscale.
         y_range (list, optional): y range. Defaults to Autoscale.
