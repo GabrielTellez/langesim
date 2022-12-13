@@ -748,8 +748,7 @@ class Simulator:
             dt (float, optional): time step. Defaults to 0.001.
             tot_steps (int, optional): total steps of each simulation. Defaults to 10000.
             noise_scaler (float, optional): brownian noise scale k_B T. Defaults to 1.0.
-            snapshot_step (int, optional): save a snapshot of simulation at
-            each snapshot_step time. Defaults to 100.
+            snapshot_step (int, optional): save a snapshot of simulation at each snapshot_step time. Defaults to 100.
             k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.
             center (float function, optional): center function of the potential. Defaults to center(t)=0.0.
             harmonic_potential (boolean, optional): If True: the external potential
