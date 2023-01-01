@@ -95,7 +95,7 @@
     <span class="n">potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">initial_distribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Makes a numba compiled njit langevin simulator of a brownian</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes a numba compiled njit langevin simulator of a brownian</span>
 <span class="sd">    particle in an external time variable potential or force</span>
 
 <span class="sd">    Args:</span>
@@ -123,7 +123,7 @@
         <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-                <span class="sd">&quot;&quot;&quot;Default stiffness for the harmonic potential</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Default stiffness for the harmonic potential</span>
 <span class="sd">                t |--&gt; 1.0</span>
 <span class="sd">                &quot;&quot;&quot;</span>
                 <span class="k">return</span> <span class="mf">1.0</span>
@@ -131,7 +131,7 @@
         <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-                <span class="sd">&quot;&quot;&quot;Default center for the harmonic potential</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Default center for the harmonic potential</span>
 <span class="sd">                t |--&gt; 0.0</span>
 <span class="sd">                &quot;&quot;&quot;</span>
                 <span class="k">return</span> <span class="mf">0.0</span>
@@ -141,19 +141,19 @@
 
         <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
         <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Force on the particle&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Force on the particle&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="o">-</span><span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
 
         <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
         <span class="k">def</span> <span class="nf">U</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Harmonic potential energy&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Harmonic potential energy&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">initial_distribution</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
             <span class="k">def</span> <span class="nf">initial_distribution</span><span class="p">():</span>
-                <span class="sd">&quot;&quot;&quot;Samples initial position according to the equilibrium distribution</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Samples initial position according to the equilibrium distribution</span>
 
 <span class="sd">                Returns:</span>
 <span class="sd">                    float: x random sample distributed according to exp(-k(0)*(x-center(0))**2/2)</span>
@@ -224,7 +224,7 @@
         <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
         <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Function that performs one simulation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that performs one simulation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            tot_sims (int, optional): default total number of simulations. Defaults to 1000.</span>
@@ -286,7 +286,7 @@
         <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
         <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Function that performs many simulations with initial condition at</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that performs many simulations with initial condition at</span>
 <span class="sd">        thermal equilibrium at t=0</span>
 
 <span class="sd">        Args:</span>
@@ -338,7 +338,7 @@
 
 
 <div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Stores simulation parameters and results.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores simulation parameters and results.</span>
 <span class="sd">    Analyses the results: builds PDF of the simulation results (position,</span>
 <span class="sd">    work, etc..)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -360,7 +360,7 @@
         <span class="n">force</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initializes the Simulation class with parameters and raw results</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the Simulation class with parameters and raw results</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            tot_sims (int): total number of simulations.</span>
@@ -435,7 +435,7 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Simulation &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
 
 <div class="viewcode-block" id="Simulation.build_histogram"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">build_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">q_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Builds the histogram of a quantity</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the histogram of a quantity</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            quantity (string): quantity to build its histogram. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
@@ -458,7 +458,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Simulation.build_pdf"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">build_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Builds the probability density function (PDF) for a quantity.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the probability density function (PDF) for a quantity.</span>
 <span class="sd">        The PDF is build and function is defined to access it in self.pdf(quantity)</span>
 
 <span class="sd">        Args:</span>
@@ -508,7 +508,7 @@
         <span class="c1"># pdf = interp2d(x, t, pdf_values)</span>
 
 <div class="viewcode-block" id="Simulation.build_averages"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_averages">[docs]</a>    <span class="k">def</span> <span class="nf">build_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes the average of a quantity.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the average of a quantity.</span>
 <span class="sd">        The average at time t (with corresponding time_index of the snapshot)</span>
 <span class="sd">        is stored in averages[quantity][time_index]</span>
 <span class="sd">        A function giving the average as a function of time is created and</span>
@@ -540,7 +540,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">average_func</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">av_fnct</span></div>
 
 <div class="viewcode-block" id="Simulation.build_variances"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_variances">[docs]</a>    <span class="k">def</span> <span class="nf">build_variances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes the variance of a quantity.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the variance of a quantity.</span>
 <span class="sd">        The variance at time t (with corresponding time_index of the snapshot)</span>
 <span class="sd">        is stored in variances[quantity][time_index]</span>
 <span class="sd">        A function giving the variance as a function of time is created and</span>
@@ -579,7 +579,7 @@
         <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
         <span class="n">show_x_eq_distrib</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Shows an animation of the evolution of the PDF of a quantity</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shows an animation of the evolution of the PDF of a quantity</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            quantity (string): quantity to animate its PDF. Must be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
@@ -615,7 +615,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Simulation.save"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Saves the simulation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves the simulation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filename (string): filename where the simulation is saved</span>
@@ -625,7 +625,7 @@
 
 <div class="viewcode-block" id="Simulation.load"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.load">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Loads a simulation from file</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads a simulation from file</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filename (string): filename of the simulation to load</span>
@@ -641,7 +641,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; does not contain a simulation.&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Simulation.analyse"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Builds all histograms, PDF, averages and variances&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds all histograms, PDF, averages and variances&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_pdf</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -651,7 +651,7 @@
 <div class="viewcode-block" id="Simulation.plot_average"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.plot_average">[docs]</a>    <span class="k">def</span> <span class="nf">plot_average</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_label</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plots &lt;quantity&gt; as a function of time</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots &lt;quantity&gt; as a function of time</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            quantity (string): quantity to plot. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
@@ -688,7 +688,7 @@
 <div class="viewcode-block" id="Simulation.plot_variance"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.plot_variance">[docs]</a>    <span class="k">def</span> <span class="nf">plot_variance</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_label</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plots the variance of quantity as a function of time</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots the variance of quantity as a function of time</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            quantity (string): quantity to plot. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
@@ -732,7 +732,7 @@
         <span class="n">t_label</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span>
         <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plots quantity as a function of time for simulations listed in sim_list</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots quantity as a function of time for simulations listed in sim_list</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            quantity (str): quantity to plot. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
@@ -792,7 +792,7 @@
 
 
 <div class="viewcode-block" id="Simulator"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator">[docs]</a><span class="k">class</span> <span class="nc">Simulator</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Simulator class for Langevin dynamics of a harmonic oscillator with</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulator class for Langevin dynamics of a harmonic oscillator with</span>
 <span class="sd">    variable potential. Encapsulates the simulator, perform</span>
 <span class="sd">    simulations, analyses them and store results</span>
 <span class="sd">    of simulation</span>
@@ -812,7 +812,7 @@
         <span class="n">potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">initial_distribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initializes the Simulator</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the Simulator</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            tot_sims (int, optional): total number of simulations. Defaults to 1000.</span>
@@ -836,7 +836,7 @@
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
 
                 <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-                    <span class="sd">&quot;&quot;&quot;Default stiffness for the harmonic potential</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Default stiffness for the harmonic potential</span>
 <span class="sd">                    t |--&gt; 1.0</span>
 <span class="sd">                    &quot;&quot;&quot;</span>
                     <span class="k">return</span> <span class="mf">1.0</span>
@@ -844,23 +844,23 @@
             <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
 
                 <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-                    <span class="sd">&quot;&quot;&quot;Default center for the harmonic potential</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Default center for the harmonic potential</span>
 <span class="sd">                    t |--&gt; 0.0</span>
 <span class="sd">                    &quot;&quot;&quot;</span>
                     <span class="k">return</span> <span class="mf">0.0</span>
 
             <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-                <span class="sd">&quot;&quot;&quot;Force on the particle&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Force on the particle&quot;&quot;&quot;</span>
                 <span class="k">return</span> <span class="o">-</span><span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
 
             <span class="k">def</span> <span class="nf">potential</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-                <span class="sd">&quot;&quot;&quot;Harmonic potential energy&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Harmonic potential energy&quot;&quot;&quot;</span>
                 <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">initial_distribution_not_compiled</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
 
                 <span class="k">def</span> <span class="nf">initial_distribution_not_compiled</span><span class="p">():</span>
-                    <span class="sd">&quot;&quot;&quot;Samples initial position according to the equilibrium distribution</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Samples initial position according to the equilibrium distribution</span>
 <span class="sd">                    Returns:</span>
 <span class="sd">                        float: x random sample distributed according to exp(-k(0)*(x-center(0)**2/2))</span>
 <span class="sd">                    &quot;&quot;&quot;</span>
@@ -904,7 +904,7 @@
         <span class="n">snapshot_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Runs a simulation and store the results</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a simulation and store the results</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">          tot_sims (int, optional): total number of simulations.</span>
@@ -945,7 +945,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">simulations_performed</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="Simulator.analyse"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Performs the analysis of simulation number sim_num</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs the analysis of simulation number sim_num</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sim_num (int, optional): simulation number. Defaults to last simulation performed.</span>
