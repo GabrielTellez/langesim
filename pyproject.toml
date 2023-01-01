@@ -14,6 +14,7 @@ scipy = "^1.9.3"
 jupyter = "^1.0.0"
 plotly = "^5.11.0"
 pandas = "^1.5.2"
+jupyterlab = "^3.5.2"
 
 
 [tool.poetry.group.dev.dependencies]
