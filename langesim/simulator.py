@@ -1,7 +1,7 @@
 """Simulator and Simulation classes 
 """
 from collections.abc import Callable
-from typing import List
+from typing import List, Tuple
 import numpy as np
 import plotly.graph_objects as go
 import numba as nb
@@ -353,7 +353,7 @@ class Simulation:
             "delta_U": delta_U,
             "energy": energy,
         }
-        self.histogram: dict[str, np.array] = {}
+        self.histogram: dict[str, List[Tuple[np.ndarray, np.ndarray]]] = {}
         self.pdf: dict[str, Callable[[float, float], float]] = {}
         self.averages: dict[str, np.array] = {}
         self.average_func: dict[str, Callable[[float], float]] = {}
@@ -373,8 +373,7 @@ class Simulation:
         """
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
-        self.histogram[quantity] = np.array(
-            [
+        self.histogram[quantity] = [
                 np.histogram(
                     self.results[quantity][:, ti],
                     density=True,
@@ -382,9 +381,7 @@ class Simulation:
                     bins=bins,
                 )
                 for ti in range(0, len(self.results["times"]))
-            ],
-            dtype=object,
-        )
+            ]
 
     def build_pdf(self, quantity):
         """Builds the probability density function (PDF) for a quantity.
@@ -400,6 +397,7 @@ class Simulation:
             self.build_histogram(quantity)
 
         def pdf(x, t):
+            # To do: Rewrite this to be numpy compatible. Maybe use scipy interpolations.
             # time t to snapshot index ti
             bins_t = self.results["times"]
             if t < np.min(bins_t) or t > np.max(bins_t):
@@ -413,7 +411,7 @@ class Simulation:
             # self.histogram[quantity][ti, 0] # contains P(x)
             # self.histogram[quantity][ti, 1] # contains x
             # get the index corresponding to value x in the bins
-            bins_x = self.histogram[quantity][ti, 1]
+            (hist, bins_x) = self.histogram[quantity][ti]
             if x < np.min(bins_x) or x > np.max(bins_x):
                 raise ValueError(
                     f"{quantity}={x} is out of bounds [{np.min(bins_x)}, {np.max(bins_x)}"
@@ -422,7 +420,7 @@ class Simulation:
             index_x = np.digitize(x, bins_x) - 1
             if index_x < 0:
                 index_x = 0
-            return self.histogram[quantity][ti, 0][index_x]
+            return hist[index_x]
 
         self.pdf[quantity] = pdf
 

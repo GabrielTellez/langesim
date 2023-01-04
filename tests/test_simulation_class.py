@@ -75,7 +75,7 @@ def dummy_sim_const_histo():
     tot_steps = 100
     snapshot_step = 101
     noise_scaler = 1.0
-    tot_snapshots = int(tot_steps / snapshot_step) + 1
+    # tot_snapshots = int(tot_steps / snapshot_step) + 1
     x = np.array([[0.0, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 0.8]])
     x = x.transpose()
     work = x
@@ -255,10 +255,13 @@ def test_build_histogram(dummy_sim, quantity):
         sim,
     ) = dummy_sim
     bins = 300
-    q_range = [-30, 3.0]
+    q_range = [-3.0, 3.0]
     sim.build_histogram(quantity, bins=bins, q_range=q_range)
-    shape = (len(sim.results["times"]), 2)
-    assert np.shape(sim.histogram[quantity]) == shape
+    size = len(sim.results["times"])
+    assert type(sim.histogram[quantity]) == list
+    assert len(sim.histogram[quantity]) == size
+    assert type(sim.histogram[quantity][0]) == tuple
+    assert len(sim.histogram[quantity][0]) == 2
 
 
 @pytest.mark.parametrize(
