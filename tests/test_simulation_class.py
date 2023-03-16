@@ -8,7 +8,7 @@ import pickle
 
 @pytest.fixture
 def dummy_sim():
-    """Builds a simulation with dummy paramaters and data"""
+    """Builds a simulation with dummy parameters and data"""
 
     def k(t):
         """t |--> 1.0"""
