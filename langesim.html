@@ -126,6 +126,246 @@
 <p>Stores simulation parameters and results.
 Analyses the results: builds PDF of the simulation results (position,
 work, etc..)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.tot_sims">
+<span class="sig-name descname"><span class="pre">tot_sims</span></span><a class="headerlink" href="#langesim.simulator.Simulation.tot_sims" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of individual simulations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#langesim.simulator.Simulation.dt" title="Permalink to this definition"></a></dt>
+<dd><p>time step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.tot_steps">
+<span class="sig-name descname"><span class="pre">tot_steps</span></span><a class="headerlink" href="#langesim.simulator.Simulation.tot_steps" title="Permalink to this definition"></a></dt>
+<dd><p>total steps of the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.noise_scaler">
+<span class="sig-name descname"><span class="pre">noise_scaler</span></span><a class="headerlink" href="#langesim.simulator.Simulation.noise_scaler" title="Permalink to this definition"></a></dt>
+<dd><p>brownian noise variance (k_B T). Defaults to 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#langesim.simulator.Simulation.name" title="Permalink to this definition"></a></dt>
+<dd><p>name of the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#langesim.simulator.Simulation.k" title="Permalink to this definition"></a></dt>
+<dd><p>function k(t) that gives the harmonic potential stifness as a function of time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#langesim.simulator.Simulation.center" title="Permalink to this definition"></a></dt>
+<dd><p>function center(t) of the harmonic potential as a function of time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.harmonic_potential">
+<span class="sig-name descname"><span class="pre">harmonic_potential</span></span><a class="headerlink" href="#langesim.simulator.Simulation.harmonic_potential" title="Permalink to this definition"></a></dt>
+<dd><p>True if the potential is harmonic, False otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.force">
+<span class="sig-name descname"><span class="pre">force</span></span><a class="headerlink" href="#langesim.simulator.Simulation.force" title="Permalink to this definition"></a></dt>
+<dd><p>function force(x,t) applied on the particle at position x at time t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><a class="headerlink" href="#langesim.simulator.Simulation.potential" title="Permalink to this definition"></a></dt>
+<dd><p>function potential(x,t) energy of the particle at position x at time t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.results">
+<span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#langesim.simulator.Simulation.results" title="Permalink to this definition"></a></dt>
+<dd><p>results of the simulations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">,</span> <span class="c1"># (ndarray): times where snapshot where taken.</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>         <span class="c1"># (ndarray of shape (tot_sims, tot_snapshots)):</span>
+                    <span class="c1"># x[sim][ts] is the position of the brownian particle in</span>
+                    <span class="c1"># simulation number num and snapshot index ts</span>
+    <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="n">power</span><span class="p">,</span> <span class="c1"># (ndarray of shape (tot_sims, tot_snapshots)):</span>
+                    <span class="c1"># power[sim][ts] is the power into the system</span>
+                    <span class="c1"># at snapshot ts and simulation sim</span>
+    <span class="s2">&quot;work&quot;</span><span class="p">:</span> <span class="n">work</span><span class="p">,</span>   <span class="c1"># (ndarray of shape (tot_sims, tot_snapshots)):</span>
+                    <span class="c1"># work[sim][ts] is the work performed into the</span>
+                    <span class="c1"># system in simulation sim up to snapshot ts</span>
+    <span class="s2">&quot;heat&quot;</span><span class="p">:</span> <span class="n">heat</span><span class="p">,</span>   <span class="c1"># (ndarray of shape (tot_sims, tot_snapshots)):</span>
+                    <span class="c1"># heat[sim][ts] into the system in simulation sim</span>
+                    <span class="c1"># up to snapshot ts</span>
+    <span class="s2">&quot;delta_U&quot;</span><span class="p">:</span> <span class="n">delta_U</span><span class="p">,</span> <span class="c1"># (ndarray of shape (tot_sims, tot_snapshots)):</span>
+                        <span class="c1"># delta_U[sim][ts] is the energy difference</span>
+                        <span class="c1"># between snapshot = 0 and current snapshot ts</span>
+                        <span class="c1"># in simulation sim</span>
+    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">energy</span><span class="p">,</span>   <span class="c1"># (ndarray of shape (tot_sims, tot_snapshots)):</span>
+                        <span class="c1"># energy[sim][ts] in simulation sim at snapshot ts</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.histogram">
+<span class="sig-name descname"><span class="pre">histogram</span></span><a class="headerlink" href="#langesim.simulator.Simulation.histogram" title="Permalink to this definition"></a></dt>
+<dd><p>histograms of quantities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">histogram</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">histograms</span> <span class="n">of</span> <span class="n">position</span>
+    <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">histogram</span> <span class="n">of</span> <span class="n">power</span>
+    <span class="s2">&quot;work&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">histogram</span> <span class="n">of</span> <span class="n">work</span>
+    <span class="s2">&quot;heat&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">histograms</span> <span class="n">of</span> <span class="n">heat</span>
+    <span class="s2">&quot;delta_U&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">histograms</span> <span class="n">of</span> <span class="n">energy</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">time</span> <span class="n">t</span>
+    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">histograms</span> <span class="n">of</span> <span class="n">energy</span>
+<span class="p">}</span>
+<span class="c1"># Example: Simulation.histogram[&quot;x&quot;][i] gives the histogram of &quot;x&quot; at time</span>
+<span class="c1"># snapshot number i.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.pdf">
+<span class="sig-name descname"><span class="pre">pdf</span></span><a class="headerlink" href="#langesim.simulator.Simulation.pdf" title="Permalink to this definition"></a></dt>
+<dd><p>probability distribution functions of x, power, work, heat,
+delta_U, energy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: pdf[&quot;x&quot;](x,t) gives the PDF of position x at time t.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.averages">
+<span class="sig-name descname"><span class="pre">averages</span></span><a class="headerlink" href="#langesim.simulator.Simulation.averages" title="Permalink to this definition"></a></dt>
+<dd><p>Averages of position, work, heat, power, delta_U and energy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: averages[&quot;x&quot;][i] is the position average at snapshot number i.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.average_func">
+<span class="sig-name descname"><span class="pre">average_func</span></span><a class="headerlink" href="#langesim.simulator.Simulation.average_func" title="Permalink to this definition"></a></dt>
+<dd><p>dictionary of function that give the average at a
+given time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: average_func[&quot;x&quot;](t)= position average at time t.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.variances">
+<span class="sig-name descname"><span class="pre">variances</span></span><a class="headerlink" href="#langesim.simulator.Simulation.variances" title="Permalink to this definition"></a></dt>
+<dd><p>variances of position, work, heat, power, delta_U and energy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: variances[&quot;x&quot;][i] is the position variance at snapshot number i.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.variance_func">
+<span class="sig-name descname"><span class="pre">variance_func</span></span><a class="headerlink" href="#langesim.simulator.Simulation.variance_func" title="Permalink to this definition"></a></dt>
+<dd><p>variances of position, power, heat, work, energy at time
+t:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># t. Example: variance_func[&quot;x&quot;](t)= position variance at time t.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="langesim.simulator.Simulation.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.__init__" title="Permalink to this definition"></a></dt>
@@ -148,7 +388,7 @@ work, etc..)</p>
 </dd>
 <dt>power (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>power[sim][ts] is the power into the system at snapshot ts and simulation sim</p>
 </dd>
-<dt>work (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>work[sim][ts] is the work perfomed into the system in simulation sim up to snapshot ts</p>
+<dt>work (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>work[sim][ts] is the work performed into the system in simulation sim up to snapshot ts</p>
 </dd>
 <dt>heat (ndarray of shape (tot_sims, tot_snapshots)):</dt><dd><p>heat[sim][ts] into the system in simulation sim up to snapshot ts</p>
 </dd>
@@ -395,7 +635,149 @@ trace in the plot. Defaults to None.</p></li>
 <p>Simulator class for Langevin dynamics of a harmonic oscillator with
 variable potential. Encapsulates the simulator, perform
 simulations, analyses them and store results
-of simulation</p>
+of simulations.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.tot_sims">
+<span class="sig-name descname"><span class="pre">tot_sims</span></span><a class="headerlink" href="#langesim.simulator.Simulator.tot_sims" title="Permalink to this definition"></a></dt>
+<dd><p>default total number of simulations to run per batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#langesim.simulator.Simulator.dt" title="Permalink to this definition"></a></dt>
+<dd><p>default time step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.tot_steps">
+<span class="sig-name descname"><span class="pre">tot_steps</span></span><a class="headerlink" href="#langesim.simulator.Simulator.tot_steps" title="Permalink to this definition"></a></dt>
+<dd><p>default total steps of the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.noise_scaler">
+<span class="sig-name descname"><span class="pre">noise_scaler</span></span><a class="headerlink" href="#langesim.simulator.Simulator.noise_scaler" title="Permalink to this definition"></a></dt>
+<dd><p>default brownian noise variance (k_B T).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#langesim.simulator.Simulator.k" title="Permalink to this definition"></a></dt>
+<dd><p>function k(t) that gives the harmonic potential stifness as a function of time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#langesim.simulator.Simulator.center" title="Permalink to this definition"></a></dt>
+<dd><p>function center(t) of the harmonic potential as a function of time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.harmonic_potential">
+<span class="sig-name descname"><span class="pre">harmonic_potential</span></span><a class="headerlink" href="#langesim.simulator.Simulator.harmonic_potential" title="Permalink to this definition"></a></dt>
+<dd><p>True if the potential is harmonic, False otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.force">
+<span class="sig-name descname"><span class="pre">force</span></span><a class="headerlink" href="#langesim.simulator.Simulator.force" title="Permalink to this definition"></a></dt>
+<dd><p>function force(x,t) applied on the particle at position x at time t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><a class="headerlink" href="#langesim.simulator.Simulator.potential" title="Permalink to this definition"></a></dt>
+<dd><p>function potential(x,t) energy of the particle at position x at time t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.initial_distribution">
+<span class="sig-name descname"><span class="pre">initial_distribution</span></span><a class="headerlink" href="#langesim.simulator.Simulator.initial_distribution" title="Permalink to this definition"></a></dt>
+<dd><p>function without arguments that
+samples the initial distribution of the particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.simulator">
+<span class="sig-name descname"><span class="pre">simulator</span></span><a class="headerlink" href="#langesim.simulator.Simulator.simulator" title="Permalink to this definition"></a></dt>
+<dd><p>numba JIT function that performs simulations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dispatcher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.simulations_performed">
+<span class="sig-name descname"><span class="pre">simulations_performed</span></span><a class="headerlink" href="#langesim.simulator.Simulator.simulations_performed" title="Permalink to this definition"></a></dt>
+<dd><p>number of batches of simulations that the Simulator has
+done. It is the number of times that Simulator.run() has been
+called.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulator.simulation">
+<span class="sig-name descname"><span class="pre">simulation</span></span><a class="headerlink" href="#langesim.simulator.Simulator.simulation" title="Permalink to this definition"></a></dt>
+<dd><p>list of Simulation objects that contain the results
+of the simulations that have been runned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="langesim.simulator.Simulator.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harmonic_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulator.__init__" title="Permalink to this definition"></a></dt>
@@ -437,7 +819,8 @@ condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0
 <dl class="py method">
 <dt class="sig sig-object py" id="langesim.simulator.Simulator.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tot_sims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_scaler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulator.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulator.run" title="Permalink to this definition"></a></dt>
-<dd><p>Runs a simulation and store the results</p>
+<dd><p>Runs a batch of tot_sim simulations and appends the results to
+Simulator.simulation list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -478,7 +861,7 @@ the the external potential is given by potential argument</p></li>
 <li><p><strong>force</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – the external force</p></li>
 <li><p><strong>potential</strong> (<em>float function</em><em>(</em><em>x</em><em>,</em><em>t</em><em>)</em><em>, </em><em>optional</em>) – the external potential</p></li>
 <li><p><strong>initial_distribution</strong> (<em>float function</em><em>(</em><em>)</em><em>, </em><em>optional</em>) – initial
-condition for x(0). Default: sampled from Bolztmann factor at time 0: exp(-U(x,0))</p></li>
+condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

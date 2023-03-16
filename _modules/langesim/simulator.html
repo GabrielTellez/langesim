@@ -114,7 +114,7 @@
 <span class="sd">        force (float function(x,t), optional): the external force</span>
 <span class="sd">        potential (float function(x,t), optional): the external potential</span>
 <span class="sd">        initial_distribution (float function(), optional): initial</span>
-<span class="sd">            condition for x(0). Default: sampled from Bolztmann factor at time 0: exp(-U(x,0))</span>
+<span class="sd">            condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        njitted function: numba compiled function that performs simulations</span>
@@ -248,35 +248,47 @@
         <span class="n">heat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">delta_U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">times_snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">xold</span> <span class="o">=</span> <span class="n">xinit</span>
         <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xinit</span>
         <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">q</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">p</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># step = 0</span>
         <span class="n">snapshot_index</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">while</span> <span class="n">snapshot_index</span> <span class="o">&lt;=</span> <span class="n">tot_snapshots</span><span class="p">:</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">step</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="c1"># Use a predefined array of times to avoid rounding errors from</span>
+        <span class="c1"># computing it as step*dt</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tot_steps</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="c1"># while snapshot_index &lt;= tot_snapshots:</span>
+            <span class="c1">#   t = step * dt</span>
             <span class="n">xnew</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">xold</span>
                 <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">xold</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
                 <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">()</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">noise_scaler</span><span class="p">)</span>
             <span class="p">)</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">+</span> <span class="n">p</span>
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">+</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">xold</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="n">step</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="n">snapshot_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># step = step + 1</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">snapshot_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Take a snapshot of the simulation</span>
                 <span class="n">snapshot_index</span> <span class="o">=</span> <span class="n">snapshot_index</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">x</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">xnew</span>
                 <span class="n">power</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span> <span class="o">/</span> <span class="n">dt</span>
                 <span class="n">work</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
                 <span class="n">heat</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
-                <span class="n">delta_U</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">energy</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">)</span>
+                <span class="n">delta_U</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">energy</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">times_snapshots</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">snapshot_index</span> <span class="o">&gt;=</span> <span class="n">tot_snapshots</span><span class="p">:</span>
+                    <span class="c1"># No need to continue the simulation after the last snapshot</span>
+                    <span class="c1"># have been taken</span>
+                    <span class="k">break</span>
             <span class="n">xold</span> <span class="o">=</span> <span class="n">xnew</span>
-        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">times_snapshots</span>
 
     <span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">many_sims_parallel</span><span class="p">(</span>
@@ -286,8 +298,8 @@
         <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
         <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that performs many simulations with initial condition at</span>
-<span class="sd">        thermal equilibrium at t=0</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that performs many simulations with a given initial</span>
+<span class="sd">        condition at t=0</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">          tot_sims (int, optional): default total number of simulations. Defaults to 1000.</span>
@@ -311,7 +323,8 @@
         <span class="n">heat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">delta_U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tot_steps</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">snapshot_step</span><span class="p">)</span>
+        <span class="c1"># times = np.arange(0, (1 + tot_steps) * dt, dt * snapshot_step)</span>
+        <span class="n">times_snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sim_num</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">tot_sims</span><span class="p">):</span>
             <span class="c1"># initial position taken from a given initial_distribution</span>
             <span class="n">xinit</span> <span class="o">=</span> <span class="n">initial_distribution</span><span class="p">()</span>
@@ -322,6 +335,7 @@
                 <span class="n">heat</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
                 <span class="n">delta_U</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
                 <span class="n">energy</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">times_snapshots</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
             <span class="p">)</span> <span class="o">=</span> <span class="n">one_simulation</span><span class="p">(</span>
                 <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
                 <span class="n">tot_steps</span><span class="o">=</span><span class="n">tot_steps</span><span class="p">,</span>
@@ -329,6 +343,7 @@
                 <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
                 <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">times_snapshots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># all snapshot times should be the same.</span>
         <span class="k">return</span> <span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span>
 
     <span class="k">return</span> <span class="n">many_sims_parallel</span></div>
@@ -341,6 +356,79 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores simulation parameters and results.</span>
 <span class="sd">    Analyses the results: builds PDF of the simulation results (position,</span>
 <span class="sd">    work, etc..)</span>
+
+<span class="sd">    Attributes:</span>
+
+<span class="sd">        tot_sims (int): Total number of individual simulations.</span>
+<span class="sd">        dt (float): time step</span>
+<span class="sd">        tot_steps (int): total steps of the simulation.</span>
+<span class="sd">        noise_scaler (float): brownian noise variance (k_B T). Defaults to 1.0.</span>
+<span class="sd">        name (str): name of the simulation.</span>
+<span class="sd">        k (Callable): function k(t) that gives the harmonic potential stifness as a function of time.</span>
+<span class="sd">        center (Callable): function center(t) of the harmonic potential as a function of time</span>
+<span class="sd">        harmonic_potential (bool): True if the potential is harmonic, False otherwise.</span>
+<span class="sd">        force (Callable): function force(x,t) applied on the particle at position x at time t.</span>
+<span class="sd">        potential (Callable): function potential(x,t) energy of the particle at position x at time t.</span>
+<span class="sd">        results (dict): results of the simulations::</span>
+
+<span class="sd">            results = {</span>
+<span class="sd">                &quot;times&quot;: times, # (ndarray): times where snapshot where taken. </span>
+<span class="sd">                &quot;x&quot;: x,         # (ndarray of shape (tot_sims, tot_snapshots)): </span>
+<span class="sd">                                # x[sim][ts] is the position of the brownian particle in</span>
+<span class="sd">                                # simulation number num and snapshot index ts       </span>
+<span class="sd">                &quot;power&quot;: power, # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # power[sim][ts] is the power into the system </span>
+<span class="sd">                                # at snapshot ts and simulation sim               </span>
+<span class="sd">                &quot;work&quot;: work,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # work[sim][ts] is the work performed into the</span>
+<span class="sd">                                # system in simulation sim up to snapshot ts</span>
+<span class="sd">                &quot;heat&quot;: heat,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # heat[sim][ts] into the system in simulation sim </span>
+<span class="sd">                                # up to snapshot ts            </span>
+<span class="sd">                &quot;delta_U&quot;: delta_U, # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                    # delta_U[sim][ts] is the energy difference</span>
+<span class="sd">                                    # between snapshot = 0 and current snapshot ts</span>
+<span class="sd">                                    # in simulation sim                </span>
+<span class="sd">                &quot;energy&quot;: energy,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                    # energy[sim][ts] in simulation sim at snapshot ts         </span>
+<span class="sd">            } </span>
+
+<span class="sd">        histogram (dict): histograms of quantities::</span>
+
+<span class="sd">            histogram = {</span>
+<span class="sd">                &quot;x&quot;: list of histograms of position</span>
+<span class="sd">                &quot;power&quot;: list histogram of power</span>
+<span class="sd">                &quot;work&quot;: list of histogram of work </span>
+<span class="sd">                &quot;heat&quot;: list of histograms of heat </span>
+<span class="sd">                &quot;delta_U&quot;: list of histograms of energy difference between t=0 and time t </span>
+<span class="sd">                &quot;energy&quot;: list of histograms of energy</span>
+<span class="sd">            }</span>
+<span class="sd">            # Example: Simulation.histogram[&quot;x&quot;][i] gives the histogram of &quot;x&quot; at time</span>
+<span class="sd">            # snapshot number i.</span>
+
+<span class="sd">        pdf (dict): probability distribution functions of x, power, work, heat,</span>
+<span class="sd">            delta_U, energy::</span>
+<span class="sd">             </span>
+<span class="sd">            # Example: pdf[&quot;x&quot;](x,t) gives the PDF of position x at time t.</span>
+
+<span class="sd">        averages (dict): Averages of position, work, heat, power, delta_U and energy::</span>
+
+<span class="sd">            # Example: averages[&quot;x&quot;][i] is the position average at snapshot number i.</span>
+
+<span class="sd">        average_func (dict): dictionary of function that give the average at a</span>
+<span class="sd">            given time:: </span>
+<span class="sd">        </span>
+<span class="sd">            # Example: average_func[&quot;x&quot;](t)= position average at time t.</span>
+
+<span class="sd">        variances (dict): variances of position, work, heat, power, delta_U and energy::</span>
+
+<span class="sd">            # Example: variances[&quot;x&quot;][i] is the position variance at snapshot number i.</span>
+<span class="sd">            </span>
+<span class="sd">        variance_func (dict): variances of position, power, heat, work, energy at time</span>
+<span class="sd">            t::</span>
+<span class="sd">        </span>
+<span class="sd">            # t. Example: variance_func[&quot;x&quot;](t)= position variance at time t.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">result_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="s2">&quot;work&quot;</span><span class="p">,</span> <span class="s2">&quot;heat&quot;</span><span class="p">,</span> <span class="s2">&quot;delta_U&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">]</span>
@@ -382,7 +470,7 @@
 <span class="sd">                    power[sim][ts] is the power into the system at snapshot ts and simulation sim</span>
 
 <span class="sd">                work (ndarray of shape (tot_sims, tot_snapshots)):</span>
-<span class="sd">                    work[sim][ts] is the work perfomed into the system in simulation sim up to snapshot ts</span>
+<span class="sd">                    work[sim][ts] is the work performed into the system in simulation sim up to snapshot ts</span>
 
 <span class="sd">                heat (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                    heat[sim][ts] into the system in simulation sim up to snapshot ts</span>
@@ -445,14 +533,14 @@
         <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">][:,</span> <span class="n">ti</span><span class="p">],</span>
-                    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="nb">range</span><span class="o">=</span><span class="n">q_range</span><span class="p">,</span>
-                    <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]))</span>
-            <span class="p">]</span></div>
+            <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">][:,</span> <span class="n">ti</span><span class="p">],</span>
+                <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="nb">range</span><span class="o">=</span><span class="n">q_range</span><span class="p">,</span>
+                <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]))</span>
+        <span class="p">]</span></div>
 
 <div class="viewcode-block" id="Simulation.build_pdf"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">build_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the probability density function (PDF) for a quantity.</span>
@@ -793,7 +881,28 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulator class for Langevin dynamics of a harmonic oscillator with</span>
 <span class="sd">    variable potential. Encapsulates the simulator, perform</span>
 <span class="sd">    simulations, analyses them and store results</span>
-<span class="sd">    of simulation</span>
+<span class="sd">    of simulations.</span>
+
+<span class="sd">    Attributes:</span>
+
+<span class="sd">        tot_sims (int): default total number of simulations to run per batch.</span>
+<span class="sd">        dt (float): default time step.</span>
+<span class="sd">        tot_steps (int): default total steps of the simulation</span>
+<span class="sd">        noise_scaler (float): default brownian noise variance (k_B T). </span>
+<span class="sd">        k (Callable): function k(t) that gives the harmonic potential stifness as a function of time.</span>
+<span class="sd">        center (Callable): function center(t) of the harmonic potential as a function of time</span>
+<span class="sd">        harmonic_potential (bool): True if the potential is harmonic, False otherwise.</span>
+<span class="sd">        force (Callable): function force(x,t) applied on the particle at position x at time t.</span>
+<span class="sd">        potential (Callable): function potential(x,t) energy of the particle at position x at time t.</span>
+<span class="sd">        initial_distribution (Callable): function without arguments that</span>
+<span class="sd">            samples the initial distribution of the particles.</span>
+<span class="sd">        simulator (Dispatcher): numba JIT function that performs simulations.</span>
+<span class="sd">        simulations_performed: number of batches of simulations that the Simulator has</span>
+<span class="sd">            done. It is the number of times that Simulator.run() has been</span>
+<span class="sd">            called.</span>
+<span class="sd">        simulation (list): list of Simulation objects that contain the results</span>
+<span class="sd">            of the simulations that have been runned.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Simulator.__init__"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -902,7 +1011,8 @@
         <span class="n">snapshot_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a simulation and store the results</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a batch of tot_sim simulations and appends the results to</span>
+<span class="sd">        Simulator.simulation list.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">          tot_sims (int, optional): total number of simulations.</span>
