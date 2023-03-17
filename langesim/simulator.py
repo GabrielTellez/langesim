@@ -31,9 +31,9 @@ def make_simulator(
         tot_sims (int, optional): default total number of simulations. Defaults to 1000.
         dt (float, optional): default time step. Defaults to 0.001.
         tot_steps (int, optional): default number of steps of each simulation. Defaults to 10000.
-        noise_scaler (float, optional): brownian noise scale k_B T. Defaults to 1.0.
+        noise_scaler (float, optional): brownian noise variance k_B T. Defaults to 1.0.
         snapshot_step (int, optional): save a snapshot of simulation at
-        each snapshot_step time. Defaults to 100.
+            each snapshot_step time. Defaults to 100.
         k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.
         center (float function, optional): center function of the potential. Defaults to center(t)=0.0.
         harmonic_potential (boolean, optional): If True: the external potential
@@ -46,7 +46,7 @@ def make_simulator(
             condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))
 
     Returns:
-        njitted function: numba compiled function that performs simulations
+        numba.Dispatcher: numba JIT compiled function that performs simulations
     """
     if harmonic_potential:
         if k == None:
@@ -825,7 +825,7 @@ class Simulator:
         potential (Callable): function potential(x,t) energy of the particle at position x at time t.
         initial_distribution (Callable): function without arguments that
             samples the initial distribution of the particles.
-        simulator (Dispatcher): numba JIT function that performs simulations.
+        simulator (numba.Dispatcher): numba JIT function that performs simulations.
         simulations_performed: number of batches of simulations that the Simulator has
             done. It is the number of times that Simulator.run() has been
             called.
