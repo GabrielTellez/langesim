@@ -102,9 +102,9 @@
 <span class="sd">        tot_sims (int, optional): default total number of simulations. Defaults to 1000.</span>
 <span class="sd">        dt (float, optional): default time step. Defaults to 0.001.</span>
 <span class="sd">        tot_steps (int, optional): default number of steps of each simulation. Defaults to 10000.</span>
-<span class="sd">        noise_scaler (float, optional): brownian noise scale k_B T. Defaults to 1.0.</span>
+<span class="sd">        noise_scaler (float, optional): brownian noise variance k_B T. Defaults to 1.0.</span>
 <span class="sd">        snapshot_step (int, optional): save a snapshot of simulation at</span>
-<span class="sd">        each snapshot_step time. Defaults to 100.</span>
+<span class="sd">            each snapshot_step time. Defaults to 100.</span>
 <span class="sd">        k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.</span>
 <span class="sd">        center (float function, optional): center function of the potential. Defaults to center(t)=0.0.</span>
 <span class="sd">        harmonic_potential (boolean, optional): If True: the external potential</span>
@@ -117,7 +117,7 @@
 <span class="sd">            condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        njitted function: numba compiled function that performs simulations</span>
+<span class="sd">        numba.Dispatcher: numba JIT compiled function that performs simulations</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">harmonic_potential</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
@@ -896,7 +896,7 @@
 <span class="sd">        potential (Callable): function potential(x,t) energy of the particle at position x at time t.</span>
 <span class="sd">        initial_distribution (Callable): function without arguments that</span>
 <span class="sd">            samples the initial distribution of the particles.</span>
-<span class="sd">        simulator (Dispatcher): numba JIT function that performs simulations.</span>
+<span class="sd">        simulator (numba.Dispatcher): numba JIT function that performs simulations.</span>
 <span class="sd">        simulations_performed: number of batches of simulations that the Simulator has</span>
 <span class="sd">            done. It is the number of times that Simulator.run() has been</span>
 <span class="sd">            called.</span>
