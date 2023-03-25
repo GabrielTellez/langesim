@@ -7,7 +7,7 @@ Langesim documentation
 ======================
 
 **Langesim** is a python library to perform overdamped Langevin simulations of a brownian particle
-in an arbitrary time depend potential.
+in an arbitrary time dependent potential.
 
 .. toctree::
    :maxdepth: 1
