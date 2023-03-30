@@ -478,12 +478,16 @@ stored in average_func(quantity)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="langesim.simulator.Simulation.build_pdf">
-<span class="sig-name descname"><span class="pre">build_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_pdf" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">build_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_pdf" title="Permalink to this definition"></a></dt>
 <dd><p>Builds the probability density function (PDF) for a quantity.
 The PDF is build and function is defined to access it in self.pdf(quantity)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>quantity</strong> (<em>string</em>) – quantity to build its pdf. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>string</em>) – quantity to build its pdf. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins for the histogram. Defaults to 300.</p></li>
+<li><p><strong>q_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
