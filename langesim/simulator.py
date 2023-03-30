@@ -471,21 +471,26 @@ class Simulation:
             for ti in range(0, len(self.results["times"]))
         ]
 
-    def build_pdf(self, quantity):
+    def build_pdf(self, quantity, bins=300, q_range=None):
         """Builds the probability density function (PDF) for a quantity.
         The PDF is build and function is defined to access it in self.pdf(quantity)
 
         Args:
             quantity (string): quantity to build its pdf. Should be in ["x", "power", "work", "heat", "delta_U", "energy"]
+            bins (int, optional): bins for the histogram. Defaults to 300.
+            q_range (list, optional): range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.
         """
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
-        if quantity not in self.histogram.keys():
-            # Build the histogram if not previously build
-            self.build_histogram(quantity)
+        #if quantity not in self.histogram.keys():
+        # (Re)build the histogram as bins and q_range might be different
+        # from previous evaluation
+        self.build_histogram(quantity, bins, q_range)
 
         def pdf(x, t):
-            # To do: Rewrite this to be numpy compatible. Maybe use scipy interpolations.
+            # To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can
+            # use np.vectorize. Maybe use scipy interpolations.
+              
             # time t to snapshot index ti
             bins_t = self.results["times"]
             if t < np.min(bins_t) or t > np.max(bins_t):

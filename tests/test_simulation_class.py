@@ -287,7 +287,7 @@ def test_build_pdf(dummy_sim, quantity):
 @pytest.mark.parametrize(
     "quantity", ["x", "power", "work", "heat", "delta_U", "energy"]
 )
-def test_pdf_call(dummy_sim, quantity):
+def test_pdf_call_basic(dummy_sim, quantity):
     """Test a call to a probability density function"""
     (
         tot_sims,
@@ -301,7 +301,9 @@ def test_pdf_call(dummy_sim, quantity):
         sim,
     ) = dummy_sim
     sim.build_pdf(quantity)
-    assert isinstance(sim.pdf[quantity](0.0, 0.0), float)
+    q_av = np.average(sim.results[quantity][:, 0])
+    # Evaluate the PDF at the average value at time 0
+    assert isinstance(sim.pdf[quantity](q_av, 0.0), float)
 
 
 def test_pdf_call(dummy_sim_const_histo):
@@ -339,8 +341,8 @@ def test_pdf_call(dummy_sim_const_histo):
         results,
         sim,
     ) = dummy_sim_const_histo
-    sim.build_histogram("x", bins=bins, q_range=(0.0, 1.0))
-    sim.build_pdf("x")
+    # sim.build_histogram("x", bins=bins, q_range=(0.0, 1.0))
+    sim.build_pdf("x", bins=bins, q_range=(0.0, 1.0))
     for x in np.arange(0.0, 1.0, 0.1):
         assert sim.pdf["x"](x, 0) == pdf_theo(x)
 
