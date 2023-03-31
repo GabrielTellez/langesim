@@ -507,7 +507,7 @@ class Simulation:
             (hist, bins_x) = self.histogram[quantity][ti]
             if x < np.min(bins_x) or x > np.max(bins_x):
                 raise ValueError(
-                    f"{quantity}={x} is out of bounds [{np.min(bins_x)}, {np.max(bins_x)}"
+                    f"{quantity}={x} is out of bounds [{np.min(bins_x)}, {np.max(bins_x)}]"
                 )
 
             index_x = np.digitize(x, bins_x) - 1
