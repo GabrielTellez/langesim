@@ -6,11 +6,11 @@ authors = ["Gabriel Tellez"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8, <3.11"
 numpy = "^1.23.4"
 numba = "^0.56.4"
 cloudpickle = "^2.2.0"
-scipy = "^1.9.3"
+scipy = "1.9.3"
 jupyter = "^1.0.0"
 plotly = "^5.11.0"
 pandas = "^1.5.2"
