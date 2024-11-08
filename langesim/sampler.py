@@ -38,7 +38,7 @@ def make_sampler(pdf, range=(-25, 25), bins=1_000_000):
     """
 
     def normalisation(x):
-        return simps(pdf(x), x)
+        return simps(pdf(x), x=x)
 
     xs = np.linspace(*range, bins)
     # define function to normalise our pdf to sum to 1 so it satisfies a distribution
