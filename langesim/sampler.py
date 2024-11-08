@@ -7,7 +7,14 @@ Adapted from:
 """
 
 import numpy as np
-from scipy.integrate import simps
+
+try:
+    # Try to import the new function for newer SciPy versions >= 1.14.0
+    from scipy.integrate import simpson as simps
+except ImportError:
+    # Fall back to the old function for older SciPy versions < 1.14.0
+    from scipy.integrate import simps 
+
 
 
 def make_sampler(pdf, range=(-25, 25), bins=1_000_000):
