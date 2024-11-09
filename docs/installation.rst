@@ -1,6 +1,15 @@
 Installation
 ============
 
+Langesim is available on PyPi and can be installed with pip. To install the
+package, create a virtual environment (see below), activate it, then install with pip:
+
+    .. code-block:: console
+
+        pip install langesim
+
+Alternatively, the package can be installed from source:        
+
 1. Clone the *langesim* repository
 
     .. code-block:: console
