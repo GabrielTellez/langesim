@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "langesim"
-version = "0.1.0"
+version = "0.1.1"
 description = "Langevin simulator of an overdamped brownian particle in an arbitrary time-dependent potential"
 authors = ["Gabriel Tellez"]
 readme = "README.md"
