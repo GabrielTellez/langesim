@@ -1,7 +1,7 @@
 Installation
 ============
 
-Langesim is available on PyPi and can be installed with pip. To install the
+Langesim is available on PyPI and can be installed with pip. To install the
 package, create a virtual environment (see below), activate it, then install with pip:
 
     .. code-block:: console
