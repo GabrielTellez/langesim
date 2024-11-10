@@ -290,7 +290,7 @@
 
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">times_snapshots</span>
 
-    <span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">many_sims_parallel</span><span class="p">(</span>
         <span class="n">tot_sims</span><span class="o">=</span><span class="n">tot_sims</span><span class="p">,</span>
         <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
@@ -372,35 +372,35 @@
 <span class="sd">        results (dict): results of the simulations::</span>
 
 <span class="sd">            results = {</span>
-<span class="sd">                &quot;times&quot;: times, # (ndarray): times where snapshot where taken. </span>
-<span class="sd">                &quot;x&quot;: x,         # (ndarray of shape (tot_sims, tot_snapshots)): </span>
+<span class="sd">                &quot;times&quot;: times, # (ndarray): times where snapshot where taken.</span>
+<span class="sd">                &quot;x&quot;: x,         # (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                                # x[sim][ts] is the position of the brownian particle in</span>
-<span class="sd">                                # simulation number num and snapshot index ts       </span>
+<span class="sd">                                # simulation number num and snapshot index ts</span>
 <span class="sd">                &quot;power&quot;: power, # (ndarray of shape (tot_sims, tot_snapshots)):</span>
-<span class="sd">                                # power[sim][ts] is the power into the system </span>
-<span class="sd">                                # at snapshot ts and simulation sim               </span>
+<span class="sd">                                # power[sim][ts] is the power into the system</span>
+<span class="sd">                                # at snapshot ts and simulation sim</span>
 <span class="sd">                &quot;work&quot;: work,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                                # work[sim][ts] is the work performed into the</span>
 <span class="sd">                                # system in simulation sim up to snapshot ts</span>
 <span class="sd">                &quot;heat&quot;: heat,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
-<span class="sd">                                # heat[sim][ts] into the system in simulation sim </span>
-<span class="sd">                                # up to snapshot ts            </span>
+<span class="sd">                                # heat[sim][ts] into the system in simulation sim</span>
+<span class="sd">                                # up to snapshot ts</span>
 <span class="sd">                &quot;delta_U&quot;: delta_U, # (ndarray of shape (tot_sims, tot_snapshots)):</span>
 <span class="sd">                                    # delta_U[sim][ts] is the energy difference</span>
 <span class="sd">                                    # between snapshot = 0 and current snapshot ts</span>
-<span class="sd">                                    # in simulation sim                </span>
+<span class="sd">                                    # in simulation sim</span>
 <span class="sd">                &quot;energy&quot;: energy,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
-<span class="sd">                                    # energy[sim][ts] in simulation sim at snapshot ts         </span>
-<span class="sd">            } </span>
+<span class="sd">                                    # energy[sim][ts] in simulation sim at snapshot ts</span>
+<span class="sd">            }</span>
 
 <span class="sd">        histogram (dict): histograms of quantities::</span>
 
 <span class="sd">            histogram = {</span>
 <span class="sd">                &quot;x&quot;: list of histograms of position</span>
 <span class="sd">                &quot;power&quot;: list histogram of power</span>
-<span class="sd">                &quot;work&quot;: list of histogram of work </span>
-<span class="sd">                &quot;heat&quot;: list of histograms of heat </span>
-<span class="sd">                &quot;delta_U&quot;: list of histograms of energy difference between t=0 and time t </span>
+<span class="sd">                &quot;work&quot;: list of histogram of work</span>
+<span class="sd">                &quot;heat&quot;: list of histograms of heat</span>
+<span class="sd">                &quot;delta_U&quot;: list of histograms of energy difference between t=0 and time t</span>
 <span class="sd">                &quot;energy&quot;: list of histograms of energy</span>
 <span class="sd">            }</span>
 <span class="sd">            # Example: Simulation.histogram[&quot;x&quot;][i] gives the histogram of &quot;x&quot; at time</span>
@@ -408,7 +408,7 @@
 
 <span class="sd">        pdf (dict): probability distribution functions of x, power, work, heat,</span>
 <span class="sd">            delta_U, energy::</span>
-<span class="sd">             </span>
+
 <span class="sd">            # Example: pdf[&quot;x&quot;](x,t) gives the PDF of position x at time t.</span>
 
 <span class="sd">        averages (dict): Averages of position, work, heat, power, delta_U and energy::</span>
@@ -416,17 +416,17 @@
 <span class="sd">            # Example: averages[&quot;x&quot;][i] is the position average at snapshot number i.</span>
 
 <span class="sd">        average_func (dict): dictionary of function that give the average at a</span>
-<span class="sd">            given time:: </span>
-<span class="sd">        </span>
+<span class="sd">            given time::</span>
+
 <span class="sd">            # Example: average_func[&quot;x&quot;](t)= position average at time t.</span>
 
 <span class="sd">        variances (dict): variances of position, work, heat, power, delta_U and energy::</span>
 
 <span class="sd">            # Example: variances[&quot;x&quot;][i] is the position variance at snapshot number i.</span>
-<span class="sd">            </span>
+
 <span class="sd">        variance_func (dict): variances of position, power, heat, work, energy at time</span>
 <span class="sd">            t::</span>
-<span class="sd">        </span>
+
 <span class="sd">            # t. Example: variance_func[&quot;x&quot;](t)= position variance at time t.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -553,7 +553,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="c1">#if quantity not in self.histogram.keys():</span>
+        <span class="c1"># if quantity not in self.histogram.keys():</span>
         <span class="c1"># (Re)build the histogram as bins and q_range might be different</span>
         <span class="c1"># from previous evaluation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">q_range</span><span class="p">)</span>
@@ -561,7 +561,7 @@
         <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
             <span class="c1"># To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can</span>
             <span class="c1"># use np.vectorize. Maybe use scipy interpolations.</span>
-              
+
             <span class="c1"># time t to snapshot index ti</span>
             <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
@@ -893,7 +893,7 @@
 <span class="sd">        tot_sims (int): default total number of simulations to run per batch.</span>
 <span class="sd">        dt (float): default time step.</span>
 <span class="sd">        tot_steps (int): default total steps of the simulation</span>
-<span class="sd">        noise_scaler (float): default brownian noise variance (k_B T). </span>
+<span class="sd">        noise_scaler (float): default brownian noise variance (k_B T).</span>
 <span class="sd">        k (Callable): function k(t) that gives the harmonic potential stifness as a function of time.</span>
 <span class="sd">        center (Callable): function center(t) of the harmonic potential as a function of time</span>
 <span class="sd">        harmonic_potential (bool): True if the potential is harmonic, False otherwise.</span>
