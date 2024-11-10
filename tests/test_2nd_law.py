@@ -69,32 +69,33 @@ def test_fuerte_Jarzynski_relation(run_sim):
     kf = 1.0
     ko = 20.0
     tf = 10.0
+
     def k(t):
-        """ Protocolo por tramos rectos horizontal """
-        if t<=0.0:
+        """Protocolo por tramos rectos horizontal"""
+        if t <= 0.0:
             return ki
-        if t<=tf/4.0:
-            return ko/2.0
-        if t<tf/2.0:
-            return ko/4.0
-        if t<3.0*tf/4.0:
-            return ko/10.0
+        if t <= tf / 4.0:
+            return ko / 2.0
+        if t < tf / 2.0:
+            return ko / 4.0
+        if t < 3.0 * tf / 4.0:
+            return ko / 10.0
         else:
             return kf
-        
+
     kv = np.vectorize(k)
 
     simulator = Simulator(
-        tot_sims = 100_000,
-        dt = 0.0001,
-        tot_steps = 10_000,
-        k = k,
-        snapshot_step = 1000,
+        tot_sims=100_000,
+        dt=0.0001,
+        tot_steps=10_000,
+        k=k,
+        snapshot_step=1000,
     )
 
     def DeltaF(t):
         return 0.5 * np.log(kv(t) / k(0))
-    
+
     simulator.run()
     sim = simulator.simulation[0]
     times = sim.results["times"]
@@ -106,4 +107,3 @@ def test_fuerte_Jarzynski_relation(run_sim):
         assert eW == pytest.approx(
             expF[t], rel=tol
         ), f"Jarzynski equality not satisfied at time t={times[t]}"
-

@@ -219,7 +219,7 @@ def make_simulator(
 
         return x, power, work, heat, delta_U, energy, times_snapshots
 
-    @nb.jit(parallel=True)
+    @nb.jit(nopython=True, parallel=True)
     def many_sims_parallel(
         tot_sims=tot_sims,
         dt=dt,
@@ -301,35 +301,35 @@ class Simulation:
         results (dict): results of the simulations::
 
             results = {
-                "times": times, # (ndarray): times where snapshot where taken. 
-                "x": x,         # (ndarray of shape (tot_sims, tot_snapshots)): 
+                "times": times, # (ndarray): times where snapshot where taken.
+                "x": x,         # (ndarray of shape (tot_sims, tot_snapshots)):
                                 # x[sim][ts] is the position of the brownian particle in
-                                # simulation number num and snapshot index ts       
+                                # simulation number num and snapshot index ts
                 "power": power, # (ndarray of shape (tot_sims, tot_snapshots)):
-                                # power[sim][ts] is the power into the system 
-                                # at snapshot ts and simulation sim               
+                                # power[sim][ts] is the power into the system
+                                # at snapshot ts and simulation sim
                 "work": work,   # (ndarray of shape (tot_sims, tot_snapshots)):
                                 # work[sim][ts] is the work performed into the
                                 # system in simulation sim up to snapshot ts
                 "heat": heat,   # (ndarray of shape (tot_sims, tot_snapshots)):
-                                # heat[sim][ts] into the system in simulation sim 
-                                # up to snapshot ts            
+                                # heat[sim][ts] into the system in simulation sim
+                                # up to snapshot ts
                 "delta_U": delta_U, # (ndarray of shape (tot_sims, tot_snapshots)):
                                     # delta_U[sim][ts] is the energy difference
                                     # between snapshot = 0 and current snapshot ts
-                                    # in simulation sim                
+                                    # in simulation sim
                 "energy": energy,   # (ndarray of shape (tot_sims, tot_snapshots)):
-                                    # energy[sim][ts] in simulation sim at snapshot ts         
-            } 
+                                    # energy[sim][ts] in simulation sim at snapshot ts
+            }
 
         histogram (dict): histograms of quantities::
 
             histogram = {
                 "x": list of histograms of position
                 "power": list histogram of power
-                "work": list of histogram of work 
-                "heat": list of histograms of heat 
-                "delta_U": list of histograms of energy difference between t=0 and time t 
+                "work": list of histogram of work
+                "heat": list of histograms of heat
+                "delta_U": list of histograms of energy difference between t=0 and time t
                 "energy": list of histograms of energy
             }
             # Example: Simulation.histogram["x"][i] gives the histogram of "x" at time
@@ -337,7 +337,7 @@ class Simulation:
 
         pdf (dict): probability distribution functions of x, power, work, heat,
             delta_U, energy::
-             
+
             # Example: pdf["x"](x,t) gives the PDF of position x at time t.
 
         averages (dict): Averages of position, work, heat, power, delta_U and energy::
@@ -345,17 +345,17 @@ class Simulation:
             # Example: averages["x"][i] is the position average at snapshot number i.
 
         average_func (dict): dictionary of function that give the average at a
-            given time:: 
-        
+            given time::
+
             # Example: average_func["x"](t)= position average at time t.
 
         variances (dict): variances of position, work, heat, power, delta_U and energy::
 
             # Example: variances["x"][i] is the position variance at snapshot number i.
-            
+
         variance_func (dict): variances of position, power, heat, work, energy at time
             t::
-        
+
             # t. Example: variance_func["x"](t)= position variance at time t.
 
     """
@@ -482,7 +482,7 @@ class Simulation:
         """
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
-        #if quantity not in self.histogram.keys():
+        # if quantity not in self.histogram.keys():
         # (Re)build the histogram as bins and q_range might be different
         # from previous evaluation
         self.build_histogram(quantity, bins, q_range)
@@ -490,7 +490,7 @@ class Simulation:
         def pdf(x, t):
             # To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can
             # use np.vectorize. Maybe use scipy interpolations.
-              
+
             # time t to snapshot index ti
             bins_t = self.results["times"]
             if t < np.min(bins_t) or t > np.max(bins_t):
@@ -822,7 +822,7 @@ class Simulator:
         tot_sims (int): default total number of simulations to run per batch.
         dt (float): default time step.
         tot_steps (int): default total steps of the simulation
-        noise_scaler (float): default brownian noise variance (k_B T). 
+        noise_scaler (float): default brownian noise variance (k_B T).
         k (Callable): function k(t) that gives the harmonic potential stifness as a function of time.
         center (Callable): function center(t) of the harmonic potential as a function of time
         harmonic_potential (bool): True if the potential is harmonic, False otherwise.

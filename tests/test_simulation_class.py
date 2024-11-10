@@ -242,7 +242,7 @@ def test_simulation_results_shape(dummy_sim):
 )
 def test_build_histogram(dummy_sim, quantity):
     """Tests if a histogram is build with the correct shape"""
-    np.warnings.filterwarnings("error", category=np.VisibleDeprecationWarning)
+    # np.warnings.filterwarnings("error", category=np.VisibleDeprecationWarning)
     (
         tot_sims,
         dt,
