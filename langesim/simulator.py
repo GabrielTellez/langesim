@@ -9,6 +9,7 @@ import cloudpickle
 import pickle
 from .graphic_utilities import animate_simulation, plot_quantity
 from .sampler import make_sampler
+import warnings
 
 
 def make_simulator(
@@ -461,6 +462,8 @@ class Simulation:
         """
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
+        if q_range is not None:
+            warnings.warn("The use of q_range is not recommended. It can introduce bugs in the histograms if there are outliers.", UserWarning)
         self.histogram[quantity] = [
             np.histogram(
                 self.results[quantity][:, ti],
@@ -485,6 +488,9 @@ class Simulation:
         # if quantity not in self.histogram.keys():
         # (Re)build the histogram as bins and q_range might be different
         # from previous evaluation
+
+    
+
         self.build_histogram(quantity, bins, q_range)
 
         def pdf(x, t):
@@ -500,6 +506,8 @@ class Simulation:
             ti = np.digitize(t, bins_t) - 1
             if ti < 0:
                 ti = 0
+            if ti == len(bins_t):
+                ti = len(bins_t) - 1 # move last time to last bin
 
             # self.histogram[quantity][ti, 0] # contains P(x)
             # self.histogram[quantity][ti, 1] # contains x
@@ -513,9 +521,11 @@ class Simulation:
             index_x = np.digitize(x, bins_x) - 1
             if index_x < 0:
                 index_x = 0
+            if index_x == len(hist):
+                index_x = index_x - 1 # move last x to last bin
             return hist[index_x]
 
-        self.pdf[quantity] = pdf
+        self.pdf[quantity] = np.vectorize(pdf)
 
         # Trying interp2d but this does not work because of different
         # ranges in x for different times t

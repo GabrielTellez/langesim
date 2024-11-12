@@ -1,6 +1,7 @@
 from langesim import Simulator, make_sampler
 import numpy as np
 from scipy.special import gamma
+from scipy.stats import entropy
 
 
 def test_inverse_transform_sampler_single():
@@ -44,21 +45,28 @@ def test_simulator_quartic_potential_initial_condition():
     k0 = 1.0
 
     def U(x, t):
-        k = k0 + 1.0 * t
+        k = k0 # + 1.0 * t
         return k * x**4 / 4.0
 
     simulator = Simulator(harmonic_potential=False, potential=U)
-    simulator.run(tot_sims=100000)
+    simulator.run(tot_sims=100_000, tot_steps=3, snapshot_step=1)
     sim = simulator.simulation[0]
-    xmax = np.power(4 * 2.0 / k0, 1 / 4.0)
-    sim.build_histogram("x", q_range=(-xmax, xmax))
+    # xmax = np.power(4 * 2.0 / k0, 1 / 4.0)
+    # sim.build_histogram("x", q_range=(-xmax, xmax))
+    sim.build_histogram("x")
 
     histo, xs = sim.histogram["x"][0]
     fs = np.exp(-U(xs[1:], 0))
+    #fs = np.exp(-U(xs[:-1], 0))
     # normalization
     Z = gamma(1 / 4) / np.sqrt(2 * np.sqrt(k0))
     fs = fs / Z
     tol = 4.7 / np.sqrt(sim.tot_sims)
     # tol = 1E-2
-    error = np.square((fs - histo) / fs).mean()
+    # outliers have overstimates probability and induce large errors in mean square error
+    # error = np.square((fs - histo) / fs).mean()
+    # Use instead the Kullback-Leibler divergence (relative entropy)
+    # entropy(pk, qk) = sum(pk * log(pk / qk)) use pk=hist first because it might
+    # have zero values
+    error = np.abs(entropy(histo, fs))
     assert error <= tol, f"error = {error} larger than tolerance {tol}"

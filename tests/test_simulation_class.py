@@ -1,9 +1,12 @@
 from langesim import Simulation
+from langesim import __version__ as langesim_version
 import numpy as np
 import pytest
 import os
 import plotly.graph_objects as go
 import pickle
+import warnings
+
 
 
 @pytest.fixture
@@ -255,8 +258,7 @@ def test_build_histogram(dummy_sim, quantity):
         sim,
     ) = dummy_sim
     bins = 300
-    q_range = [-3.0, 3.0]
-    sim.build_histogram(quantity, bins=bins, q_range=q_range)
+    sim.build_histogram(quantity, bins=bins)
     size = len(sim.results["times"])
     assert type(sim.histogram[quantity]) == list
     assert len(sim.histogram[quantity]) == size
@@ -303,7 +305,8 @@ def test_pdf_call_basic(dummy_sim, quantity):
     sim.build_pdf(quantity)
     q_av = np.average(sim.results[quantity][:, 0])
     # Evaluate the PDF at the average value at time 0
-    assert isinstance(sim.pdf[quantity](q_av, 0.0), float)
+    # check no error is raised
+    assert sim.pdf[quantity](q_av, 0.0) == sim.pdf[quantity](q_av, 0.0)
 
 
 def test_pdf_call(dummy_sim_const_histo):
@@ -342,7 +345,8 @@ def test_pdf_call(dummy_sim_const_histo):
         sim,
     ) = dummy_sim_const_histo
     # sim.build_histogram("x", bins=bins, q_range=(0.0, 1.0))
-    sim.build_pdf("x", bins=bins, q_range=(0.0, 1.0))
+    # sim.build_pdf("x", bins=bins, q_range=(0.0, 1.0)) # don't use q_range
+    sim.build_pdf("x", bins=bins)
     for x in np.arange(0.0, 1.0, 0.1):
         assert sim.pdf["x"](x, 0) == pdf_theo(x)
 
@@ -364,7 +368,7 @@ def test_pdf_quantity_out_of_bounds(dummy_sim_const_histo):
     sim.build_pdf("x")
     with pytest.raises(ValueError):
         # for x =[[0.0, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 0.8]])
-        # the PDF is not defined for x = 2, t=0
+        # the PDF is not defined for x = 2, t = 0
         sim.pdf["x"](2, 0)
 
 
@@ -420,6 +424,56 @@ def test_pdf_gaussian_call(dummy_sim_gaussian):
         assert sim.pdf["x"](x, 51) == pytest.approx(
             gaussian(x, 1.0, 3.0), rel=tol
         ), f"for x={x}, t=51"
+
+@pytest.mark.parametrize(
+    "quantity", ["x", "power", "work", "heat", "delta_U", "energy"]
+)
+def test_pdf_call_in_simulation(dummy_sim, quantity):
+    """Test that the PDF of quantity can be called for all values of quantity that
+    happenend in the simulation. This was a bug in versions <= 0.1.2"""
+    (
+        tot_sims,
+        dt,
+        tot_steps,
+        noise_scaler,
+        snapshot_step,
+        k,
+        center,
+        results,
+        sim,
+    ) = dummy_sim
+
+    sim.build_pdf("x")
+    times = sim.results["times"]
+    for sim_num in range(tot_sims):
+        for t_idx,t in enumerate(times):
+            x = sim.results["x"][sim_num, t_idx]
+            # Check that it doesn't raise an error calling sim.pdf["x"]
+            assert sim.pdf["x"](x, t) == sim.pdf["x"](x, t), f"for x={x}, t={t}. t_dx={t_idx}"
+
+def test_histogram_call_warn_q_range_not_recommended(dummy_sim):
+    """Test that a warning is raised if q_range is used in the call of the
+    histogram. Warning issued for versions >= 0.1.3"""
+    (
+        tot_sims,
+        dt,
+        tot_steps,
+        noise_scaler,
+        snapshot_step,
+        k,
+        center,
+        results,
+        sim,
+    ) = dummy_sim
+    
+    version_tuple_current = tuple(map(int, langesim_version.split(".")))
+    version_tuple_base = tuple(map(int, "0.1.3".split(".")))
+    if version_tuple_current >= version_tuple_base:
+        with pytest.warns(UserWarning):
+            sim.build_histogram("x", bins=100, q_range=(-3.0, 3.0))
+
+
+
 
 
 def test_averages(dummy_sim_const_histo):
