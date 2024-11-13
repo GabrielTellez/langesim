@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langesim.simulator &mdash; Langesim 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Langesim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Reference guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Langesim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langesim.simulator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langesim.simulator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Simulator and Simulation classes </span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
+<span class="kn">import</span> <span class="nn">cloudpickle</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">.graphic_utilities</span> <span class="kn">import</span> <span class="n">animate_simulation</span><span class="p">,</span> <span class="n">plot_quantity</span>
+<span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">make_sampler</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+
+<div class="viewcode-block" id="make_simulator"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.make_simulator">[docs]</a><span class="k">def</span> <span class="nf">make_simulator</span><span class="p">(</span>
+    <span class="n">tot_sims</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">dt</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">tot_steps</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+    <span class="n">noise_scaler</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">snapshot_step</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">harmonic_potential</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">force</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">initial_distribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes a numba compiled njit langevin simulator of a brownian</span>
+<span class="sd">    particle in an external time variable potential or force</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tot_sims (int, optional): default total number of simulations. Defaults to 1000.</span>
+<span class="sd">        dt (float, optional): default time step. Defaults to 0.001.</span>
+<span class="sd">        tot_steps (int, optional): default number of steps of each simulation. Defaults to 10000.</span>
+<span class="sd">        noise_scaler (float, optional): brownian noise variance k_B T. Defaults to 1.0.</span>
+<span class="sd">        snapshot_step (int, optional): save a snapshot of simulation at</span>
+<span class="sd">            each snapshot_step time. Defaults to 100.</span>
+<span class="sd">        k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.</span>
+<span class="sd">        center (float function, optional): center function of the potential. Defaults to center(t)=0.0.</span>
+<span class="sd">        harmonic_potential (boolean, optional): If True: the external potential</span>
+<span class="sd">            is harmonic with stiffness k(t) and center(t).</span>
+<span class="sd">            If False the external force is given by the force argument or</span>
+<span class="sd">            the the external potential is given by potential argument</span>
+<span class="sd">        force (float function(x,t), optional): the external force</span>
+<span class="sd">        potential (float function(x,t), optional): the external potential</span>
+<span class="sd">        initial_distribution (float function(), optional): initial</span>
+<span class="sd">            condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numba.Dispatcher: numba JIT compiled function that performs simulations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">harmonic_potential</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Default stiffness for the harmonic potential</span>
+<span class="sd">                t |--&gt; 1.0</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="mf">1.0</span>
+
+        <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Default center for the harmonic potential</span>
+<span class="sd">                t |--&gt; 0.0</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">k</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+
+        <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Force on the particle&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+        <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
+        <span class="k">def</span> <span class="nf">U</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Harmonic potential energy&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">initial_distribution</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
+            <span class="k">def</span> <span class="nf">initial_distribution</span><span class="p">():</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Samples initial position according to the equilibrium distribution</span>
+
+<span class="sd">                Returns:</span>
+<span class="sd">                    float: x random sample distributed according to exp(-k(0)*(x-center(0))**2/2)</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">center</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">k</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">initial_distribution</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">initial_distribution</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># In general force mode</span>
+        <span class="c1"># check that the force or the potential are defined</span>
+        <span class="k">if</span> <span class="n">force</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">potential</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;In general force mode, the force or the potential have to be provided. Both cannot be None&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">force</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># We need to compute the force from the potential</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">potential</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="mf">1e-9</span>
+                <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">U</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span> <span class="o">/</span> <span class="n">dx</span>
+
+        <span class="k">if</span> <span class="n">potential</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;In general force mode, the potential have to be provided. It is too slow to compute it from the force.&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># We need the potential from the force</span>
+            <span class="c1"># this will never run:</span>
+            <span class="c1"># f = nb.njit(force)</span>
+
+            <span class="c1"># def potential(x, t):</span>
+            <span class="c1">#     # Integral by basic numerical quadrature trapezoidal rule</span>
+            <span class="c1">#     # This is way too slow</span>
+            <span class="c1">#     dx = 1e-6</span>
+            <span class="c1">#     x0 = 0.0</span>
+            <span class="c1">#     xs = np.arange(x0 + dx, x - dx, dx)</span>
+            <span class="c1">#     integral = 0.5 * (f(x0, t) + f(x, t))</span>
+            <span class="c1">#     for xp in xs:</span>
+            <span class="c1">#         integral += f(xp, t)</span>
+            <span class="c1">#     integral = integral * dx</span>
+            <span class="c1">#     return integral</span>
+
+        <span class="k">if</span> <span class="n">initial_distribution</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">initial_distribution</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_sampler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">potential</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+
+        <span class="n">initial_distribution</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">initial_distribution</span><span class="p">)</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">force</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">potential</span><span class="p">)</span>
+        <span class="c1"># Test if potential and force are coherent</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="mf">1e-9</span>
+        <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tt</span><span class="p">]</span>
+        <span class="n">minusgradU</span> <span class="o">=</span> <span class="p">[(</span><span class="n">U</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">xx</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span> <span class="o">/</span> <span class="n">dx</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tt</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ff</span><span class="p">,</span> <span class="n">minusgradU</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Force and potential are nonconsistent: Force is different from minus grad potential&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
+    <span class="k">def</span> <span class="nf">one_simulation</span><span class="p">(</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+        <span class="n">tot_steps</span><span class="o">=</span><span class="n">tot_steps</span><span class="p">,</span>
+        <span class="n">xinit</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
+        <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that performs one simulation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tot_sims (int, optional): default total number of simulations. Defaults to 1000.</span>
+<span class="sd">            dt (float, optional): default time step. Defaults to 0.001.</span>
+<span class="sd">            tot_steps (int, optional): default number of steps of each simulation. Defaults to 10000.</span>
+<span class="sd">            noise_scaler (float, optional): brownian noise scale k_B T. Defaults to 1.0.</span>
+<span class="sd">            snapshot_step (int, optional): save a snapshot of simulation at each snapshot_step time. Defaults to 100.</span>
+
+
+<span class="sd">        Returns:</span>
+<span class="sd">            x, power, work, heat, delta_U, energy (tuple): array of</span>
+<span class="sd">              snapshots of the simulation</span>
+<span class="sd">              x = position, power, work, heat, delta_U=energy difference between</span>
+<span class="sd">               current state and initial state, energy</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tot_snapshots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tot_steps</span> <span class="o">/</span> <span class="n">snapshot_step</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">tot_snapshots</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">work</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">heat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">delta_U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">times_snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">xold</span> <span class="o">=</span> <span class="n">xinit</span>
+        <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xinit</span>
+        <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="c1"># step = 0</span>
+        <span class="n">snapshot_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Use a predefined array of times to avoid rounding errors from</span>
+        <span class="c1"># computing it as step*dt</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tot_steps</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="c1"># while snapshot_index &lt;= tot_snapshots:</span>
+            <span class="c1">#   t = step * dt</span>
+            <span class="n">xnew</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">xold</span>
+                <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">xold</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+                <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">()</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">noise_scaler</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">+</span> <span class="n">p</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">+</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">xold</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="c1"># step = step + 1</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">snapshot_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Take a snapshot of the simulation</span>
+                <span class="n">snapshot_index</span> <span class="o">=</span> <span class="n">snapshot_index</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">xnew</span>
+                <span class="n">power</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span> <span class="o">/</span> <span class="n">dt</span>
+                <span class="n">work</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
+                <span class="n">heat</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
+                <span class="n">delta_U</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">energy</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">times_snapshots</span><span class="p">[</span><span class="n">snapshot_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">snapshot_index</span> <span class="o">&gt;=</span> <span class="n">tot_snapshots</span><span class="p">:</span>
+                    <span class="c1"># No need to continue the simulation after the last snapshot</span>
+                    <span class="c1"># have been taken</span>
+                    <span class="k">break</span>
+            <span class="n">xold</span> <span class="o">=</span> <span class="n">xnew</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">times_snapshots</span>
+
+    <span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">many_sims_parallel</span><span class="p">(</span>
+        <span class="n">tot_sims</span><span class="o">=</span><span class="n">tot_sims</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+        <span class="n">tot_steps</span><span class="o">=</span><span class="n">tot_steps</span><span class="p">,</span>
+        <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
+        <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that performs many simulations with a given initial</span>
+<span class="sd">        condition at t=0</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          tot_sims (int, optional): default total number of simulations. Defaults to 1000.</span>
+<span class="sd">          dt (float, optional): default time step. Defaults to 0.001.</span>
+<span class="sd">          tot_steps (int, optional): default number of steps of each simulation. Defaults to 10000.</span>
+<span class="sd">          noise_scaler (float, optional): brownian noise scale k_B T. Defaults to 1.0.</span>
+<span class="sd">          snapshot_step (int, optional): save a snapshot of simulation at</span>
+<span class="sd">          each snapshot_step time. Defaults to 100.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            times, x, power, work, heat, delta_U, energy:</span>
+<span class="sd">              times: list of times of the snapshots</span>
+<span class="sd">              x, power, work, heat, delta_U, energy = list of positions,</span>
+<span class="sd">              power, ..., snapshots for each simulation</span>
+<span class="sd">              ie. x[sim] = [x(0), x(snapshot_step*dt), x(2*snapshot_step*dt), .... ] for simulation number sim.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tot_snapshots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tot_steps</span> <span class="o">/</span> <span class="n">snapshot_step</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tot_sims</span><span class="p">,</span> <span class="n">tot_snapshots</span><span class="p">))</span>
+        <span class="n">work</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">heat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">delta_U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># times = np.arange(0, (1 + tot_steps) * dt, dt * snapshot_step)</span>
+        <span class="n">times_snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sim_num</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">tot_sims</span><span class="p">):</span>
+            <span class="c1"># initial position taken from a given initial_distribution</span>
+            <span class="n">xinit</span> <span class="o">=</span> <span class="n">initial_distribution</span><span class="p">()</span>
+            <span class="p">(</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">power</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">work</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">heat</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">delta_U</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">energy</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+                <span class="n">times_snapshots</span><span class="p">[</span><span class="n">sim_num</span><span class="p">],</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">one_simulation</span><span class="p">(</span>
+                <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">tot_steps</span><span class="o">=</span><span class="n">tot_steps</span><span class="p">,</span>
+                <span class="n">xinit</span><span class="o">=</span><span class="n">xinit</span><span class="p">,</span>
+                <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
+                <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">times_snapshots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># all snapshot times should be the same.</span>
+        <span class="k">return</span> <span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span>
+
+    <span class="k">return</span> <span class="n">many_sims_parallel</span></div>
+
+
+<span class="c1">################################################################################</span>
+
+
+<div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores simulation parameters and results.</span>
+<span class="sd">    Analyses the results: builds PDF of the simulation results (position,</span>
+<span class="sd">    work, etc..)</span>
+
+<span class="sd">    Attributes:</span>
+
+<span class="sd">        tot_sims (int): Total number of individual simulations.</span>
+<span class="sd">        dt (float): time step</span>
+<span class="sd">        tot_steps (int): total steps of the simulation.</span>
+<span class="sd">        noise_scaler (float): brownian noise variance (k_B T). Defaults to 1.0.</span>
+<span class="sd">        name (str): name of the simulation.</span>
+<span class="sd">        k (Callable): function k(t) that gives the harmonic potential stifness as a function of time.</span>
+<span class="sd">        center (Callable): function center(t) of the harmonic potential as a function of time</span>
+<span class="sd">        harmonic_potential (bool): True if the potential is harmonic, False otherwise.</span>
+<span class="sd">        force (Callable): function force(x,t) applied on the particle at position x at time t.</span>
+<span class="sd">        potential (Callable): function potential(x,t) energy of the particle at position x at time t.</span>
+<span class="sd">        results (dict): results of the simulations::</span>
+
+<span class="sd">            results = {</span>
+<span class="sd">                &quot;times&quot;: times, # (ndarray): times where snapshot where taken.</span>
+<span class="sd">                &quot;x&quot;: x,         # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # x[sim][ts] is the position of the brownian particle in</span>
+<span class="sd">                                # simulation number num and snapshot index ts</span>
+<span class="sd">                &quot;power&quot;: power, # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # power[sim][ts] is the power into the system</span>
+<span class="sd">                                # at snapshot ts and simulation sim</span>
+<span class="sd">                &quot;work&quot;: work,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # work[sim][ts] is the work performed into the</span>
+<span class="sd">                                # system in simulation sim up to snapshot ts</span>
+<span class="sd">                &quot;heat&quot;: heat,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                # heat[sim][ts] into the system in simulation sim</span>
+<span class="sd">                                # up to snapshot ts</span>
+<span class="sd">                &quot;delta_U&quot;: delta_U, # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                    # delta_U[sim][ts] is the energy difference</span>
+<span class="sd">                                    # between snapshot = 0 and current snapshot ts</span>
+<span class="sd">                                    # in simulation sim</span>
+<span class="sd">                &quot;energy&quot;: energy,   # (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                                    # energy[sim][ts] in simulation sim at snapshot ts</span>
+<span class="sd">            }</span>
+
+<span class="sd">        histogram (dict): histograms of quantities::</span>
+
+<span class="sd">            histogram = {</span>
+<span class="sd">                &quot;x&quot;: list of histograms of position</span>
+<span class="sd">                &quot;power&quot;: list histogram of power</span>
+<span class="sd">                &quot;work&quot;: list of histogram of work</span>
+<span class="sd">                &quot;heat&quot;: list of histograms of heat</span>
+<span class="sd">                &quot;delta_U&quot;: list of histograms of energy difference between t=0 and time t</span>
+<span class="sd">                &quot;energy&quot;: list of histograms of energy</span>
+<span class="sd">            }</span>
+<span class="sd">            # Example: Simulation.histogram[&quot;x&quot;][i] gives the histogram of &quot;x&quot; at time</span>
+<span class="sd">            # snapshot number i.</span>
+
+<span class="sd">        pdf (dict): probability distribution functions of x, power, work, heat,</span>
+<span class="sd">            delta_U, energy::</span>
+
+<span class="sd">            # Example: pdf[&quot;x&quot;](x,t) gives the PDF of position x at time t.</span>
+
+<span class="sd">        averages (dict): Averages of position, work, heat, power, delta_U and energy::</span>
+
+<span class="sd">            # Example: averages[&quot;x&quot;][i] is the position average at snapshot number i.</span>
+
+<span class="sd">        average_func (dict): dictionary of function that give the average at a</span>
+<span class="sd">            given time::</span>
+
+<span class="sd">            # Example: average_func[&quot;x&quot;](t)= position average at time t.</span>
+
+<span class="sd">        variances (dict): variances of position, work, heat, power, delta_U and energy::</span>
+
+<span class="sd">            # Example: variances[&quot;x&quot;][i] is the position variance at snapshot number i.</span>
+
+<span class="sd">        variance_func (dict): variances of position, power, heat, work, energy at time</span>
+<span class="sd">            t::</span>
+
+<span class="sd">            # t. Example: variance_func[&quot;x&quot;](t)= position variance at time t.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">result_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="s2">&quot;work&quot;</span><span class="p">,</span> <span class="s2">&quot;heat&quot;</span><span class="p">,</span> <span class="s2">&quot;delta_U&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Simulation.__init__"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tot_sims</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">,</span>
+        <span class="n">tot_steps</span><span class="p">,</span>
+        <span class="n">noise_scaler</span><span class="p">,</span>
+        <span class="n">snapshot_step</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">,</span>
+        <span class="n">center</span><span class="p">,</span>
+        <span class="n">results</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">harmonic_potential</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the Simulation class with parameters and raw results</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tot_sims (int): total number of simulations.</span>
+<span class="sd">            dt (float): time step.</span>
+<span class="sd">            tot_steps (int): number of steps of each simulation.</span>
+<span class="sd">            noise_scaler (float): brownian noise scale k_B T. Defaults to 1.0.</span>
+<span class="sd">            snapshot_step (int): a snapshot of simulation has been saved each snapshot_step time.</span>
+<span class="sd">            k (float function): stiffness of the potential</span>
+<span class="sd">            center (float function): center of the potential</span>
+<span class="sd">            results (tuple): results in the form (times, x, power, work, heat, delta_U, energy) where:</span>
+
+<span class="sd">                times (ndarray):</span>
+<span class="sd">                    ndarray of times where snapshot where taken.</span>
+
+<span class="sd">                x (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                    x[sim][ts] is the position of the brownian particle in simulation number num and snapshot ts</span>
+
+<span class="sd">                power (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                    power[sim][ts] is the power into the system at snapshot ts and simulation sim</span>
+
+<span class="sd">                work (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                    work[sim][ts] is the work performed into the system in simulation sim up to snapshot ts</span>
+
+<span class="sd">                heat (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                    heat[sim][ts] into the system in simulation sim up to snapshot ts</span>
+
+<span class="sd">                delta_U (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                    delta_U[sim][ts] is the energy difference between snapshot = 0 and current snapshot ts in</span>
+<span class="sd">                    simulation sim</span>
+
+<span class="sd">                energy (ndarray of shape (tot_sims, tot_snapshots)):</span>
+<span class="sd">                    energy[sim][ts] in simulation sim at snapshot ts</span>
+
+<span class="sd">            name (string, optional): name of the simulation</span>
+<span class="sd">            harmonic_potential(boolean, optional): True if the potential is harmonic</span>
+<span class="sd">            force (float function(x,t), optional): force when the potential</span>
+<span class="sd">              is not harmonic</span>
+<span class="sd">            potential (float function(x,t), optional): potential when the potential</span>
+<span class="sd">              is not harmonic</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tot_sims</span> <span class="o">=</span> <span class="n">tot_sims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tot_steps</span> <span class="o">=</span> <span class="n">tot_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_scaler</span> <span class="o">=</span> <span class="n">noise_scaler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_step</span> <span class="o">=</span> <span class="n">snapshot_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonic_potential</span> <span class="o">=</span> <span class="n">harmonic_potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force</span> <span class="o">=</span> <span class="n">force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">potential</span> <span class="o">=</span> <span class="n">potential</span>
+
+        <span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">work</span><span class="p">,</span> <span class="n">heat</span><span class="p">,</span> <span class="n">delta_U</span><span class="p">,</span> <span class="n">energy</span><span class="p">)</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="n">power</span><span class="p">,</span>
+            <span class="s2">&quot;work&quot;</span><span class="p">:</span> <span class="n">work</span><span class="p">,</span>
+            <span class="s2">&quot;heat&quot;</span><span class="p">:</span> <span class="n">heat</span><span class="p">,</span>
+            <span class="s2">&quot;delta_U&quot;</span><span class="p">:</span> <span class="n">delta_U</span><span class="p">,</span>
+            <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">energy</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variances</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variance_func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Simulation &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+
+<div class="viewcode-block" id="Simulation.build_histogram"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">build_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">q_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the histogram of a quantity</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to build its histogram. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            bins (int, optional): bins for the histogram. Defaults to 300.</span>
+<span class="sd">            q_range (list, optional): range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">q_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The use of q_range is not recommended. It can introduce bugs in the histograms if there are outliers.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">][:,</span> <span class="n">ti</span><span class="p">],</span>
+                <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="nb">range</span><span class="o">=</span><span class="n">q_range</span><span class="p">,</span>
+                <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]))</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Simulation.build_pdf"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">build_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">q_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the probability density function (PDF) for a quantity.</span>
+<span class="sd">        The PDF is build and function is defined to access it in self.pdf(quantity)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to build its pdf. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            bins (int, optional): bins for the histogram. Defaults to 300.</span>
+<span class="sd">            q_range (list, optional): range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># if quantity not in self.histogram.keys():</span>
+        <span class="c1"># (Re)build the histogram as bins and q_range might be different</span>
+        <span class="c1"># from previous evaluation</span>
+
+    
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">q_range</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+            <span class="c1"># To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can</span>
+            <span class="c1"># use np.vectorize. Maybe use scipy interpolations.</span>
+
+            <span class="c1"># time t to snapshot index ti</span>
+            <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;In PDF of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">: time=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="p">)</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">ti</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">ti</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># move last time to last bin</span>
+
+            <span class="c1"># self.histogram[quantity][ti, 0] # contains P(x)</span>
+            <span class="c1"># self.histogram[quantity][ti, 1] # contains x</span>
+            <span class="c1"># get the index corresponding to value x in the bins</span>
+            <span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">bins_x</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_x</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">index_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bins_x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">index_x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">index_x</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">index_x</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">):</span>
+                <span class="n">index_x</span> <span class="o">=</span> <span class="n">index_x</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># move last x to last bin</span>
+            <span class="k">return</span> <span class="n">hist</span><span class="p">[</span><span class="n">index_x</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span></div>
+
+        <span class="c1"># Trying interp2d but this does not work because of different</span>
+        <span class="c1"># ranges in x for different times t</span>
+
+        <span class="c1"># t = self.results[&#39;times&#39;]</span>
+        <span class="c1"># Using initial positions for all t does not work</span>
+        <span class="c1"># x = self.histogram[quantity][0, 1][:-1]</span>
+        <span class="c1"># This has the wrong shape</span>
+        <span class="c1"># pdf_values = self.histogram[quantity][:, 0]</span>
+        <span class="c1"># pdf = interp2d(x, t, pdf_values)</span>
+
+<div class="viewcode-block" id="Simulation.build_averages"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_averages">[docs]</a>    <span class="k">def</span> <span class="nf">build_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the average of a quantity.</span>
+<span class="sd">        The average at time t (with corresponding time_index of the snapshot)</span>
+<span class="sd">        is stored in averages[quantity][time_index]</span>
+<span class="sd">        A function giving the average as a function of time is created and</span>
+<span class="sd">        stored in average_func(quantity)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to build its averages. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">av_fnct</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="c1"># time t to snapshot index ti</span>
+            <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;In average of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">: time=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="p">)</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">ti</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_func</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">av_fnct</span></div>
+
+<div class="viewcode-block" id="Simulation.build_variances"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_variances">[docs]</a>    <span class="k">def</span> <span class="nf">build_variances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the variance of a quantity.</span>
+<span class="sd">        The variance at time t (with corresponding time_index of the snapshot)</span>
+<span class="sd">        is stored in variances[quantity][time_index]</span>
+<span class="sd">        A function giving the variance as a function of time is created and</span>
+<span class="sd">        stored in variance_func(quantity)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to build its variances. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variances</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">var_fnct</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="c1"># time t to snapshot index ti</span>
+            <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;In average of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">: time=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="p">)</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">ti</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variances</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">variance_func</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_fnct</span></div>
+
+<div class="viewcode-block" id="Simulation.animate_pdf"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.animate_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">animate_pdf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">quantity</span><span class="p">,</span>
+        <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
+        <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span>
+        <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">show_x_eq_distrib</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shows an animation of the evolution of the PDF of a quantity</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to animate its PDF. Must be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            x_range (list, optional): range for the quantity in the PDF. Defaults to [-3.0, 3.0].</span>
+<span class="sd">            y_range (list, optional): range for the PDF value. Defaults to [0, 1.5].</span>
+<span class="sd">            bins (int, optional): bins for the histogram. Defaults to 300.</span>
+<span class="sd">            show_x_eq_distrib (boolean, optional): if True the instantaneous</span>
+<span class="sd">            equilibrium position distribution is shown. Defaults to None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plotly.graph_objects.figure: animation of the PDF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_x_eq_distrib</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">show_x_eq_distrib</span> <span class="o">=</span> <span class="n">quantity</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span>
+        <span class="k">return</span> <span class="n">animate_simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">],</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="n">x_label</span><span class="o">=</span><span class="n">quantity</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;P(</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">,t)&quot;</span><span class="p">,</span>
+            <span class="n">show_x_eq_distrib</span><span class="o">=</span><span class="n">show_x_eq_distrib</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
+            <span class="n">harmonic_potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonic_potential</span><span class="p">,</span>
+            <span class="n">potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulation.save"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves the simulation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (string): filename where the simulation is saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">cloudpickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">DEFAULT_PROTOCOL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulation.load"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads a simulation from file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (string): filename of the simulation to load</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Simulation: the loaded simulation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">_sim</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_sim</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_sim</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; does not contain a simulation.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulation.analyse"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds all histograms, PDF, averages and variances&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_pdf</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_averages</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_variances</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulation.plot_average"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.plot_average">[docs]</a>    <span class="k">def</span> <span class="nf">plot_average</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_label</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots &lt;quantity&gt; as a function of time</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to plot. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            t_array (np.array): time axis array</span>
+<span class="sd">            y_array (np.array): quantity to plot array</span>
+<span class="sd">            t_range (list, optional): t range. Defaults to Autoscale.</span>
+<span class="sd">            y_range (list, optional): y range. Defaults to Autoscale.</span>
+<span class="sd">            t_label (str, optional): label for t axis. Defaults to &#39;t&#39;.</span>
+<span class="sd">            y_label (str, optional): label for y axis. Defaults to &#39;&#39;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plotly.graph_objects.figure: plot of the quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_averages</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y_label</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+        <span class="c1"># make figure</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_quantity</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">[</span><span class="n">quantity</span><span class="p">],</span>
+            <span class="n">t_range</span><span class="o">=</span><span class="n">t_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">t_label</span><span class="o">=</span><span class="n">t_label</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="Simulation.plot_variance"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.plot_variance">[docs]</a>    <span class="k">def</span> <span class="nf">plot_variance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_label</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots the variance of quantity as a function of time</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to plot. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            t_array (np.array): time axis array</span>
+<span class="sd">            y_array (np.array): quantity to plot array</span>
+<span class="sd">            t_range (list, optional): t range. Defaults to Autoscale.</span>
+<span class="sd">            y_range (list, optional): y range. Defaults to Autoscale.</span>
+<span class="sd">            t_label (str, optional): label for t axis. Defaults to &#39;t&#39;.</span>
+<span class="sd">            y_label (str, optional): label for y axis. Defaults to &#39;&#39;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plotly.graph_objects.figure: plot of the quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variances</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_variances</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y_label</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Var(</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="c1"># make figure</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_quantity</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">variances</span><span class="p">[</span><span class="n">quantity</span><span class="p">],</span>
+            <span class="n">t_range</span><span class="o">=</span><span class="n">t_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">t_label</span><span class="o">=</span><span class="n">t_label</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="Simulation.plot_sim"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.plot_sim">[docs]</a>    <span class="k">def</span> <span class="nf">plot_sim</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">quantity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">sim_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">sim_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">t_label</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span>
+        <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots quantity as a function of time for simulations listed in sim_list</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (str): quantity to plot. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            sim_list (list of int): list of the simulation numbers to plot.</span>
+<span class="sd">            sim_labels (list of str, optional): list of labels for each</span>
+<span class="sd">              trace in the plot. Defaults to None.</span>
+<span class="sd">            t_array (np.array): time axis array</span>
+<span class="sd">            y_array (np.array): quantity to plot array</span>
+<span class="sd">            t_range (list, optional): t range. Defaults to Autoscale.</span>
+<span class="sd">            y_range (list, optional): y range. Defaults to Autoscale.</span>
+<span class="sd">            t_label (str, optional): label for t axis. Defaults to &#39;t&#39;.</span>
+<span class="sd">            y_label (str, optional): label for y axis. Defaults to &#39;&#39;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plotly.graph_objects.figure: plot of the quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y_label</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y_label</span> <span class="o">=</span> <span class="n">quantity</span>
+        <span class="c1"># Check if the list of simulation to plot is in range</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">num</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tot_sims</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">sim_list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot plot a simulation </span><span class="si">{</span><span class="n">sim_list</span><span class="si">=}</span><span class="s2"> out of range </span><span class="si">{</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tot_sims</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">sim_labels</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Use simulation numbers as labels for each scatter</span>
+            <span class="n">sim_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">sim_list</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim_list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;List of simulations </span><span class="si">{</span><span class="n">sim_list</span><span class="si">=}</span><span class="s2"> does not match list of labels </span><span class="si">{</span><span class="n">sim_labels</span><span class="si">=}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># print(f&quot;{sim_list=}, {sim_labels=}&quot;)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span>
+        <span class="c1"># Initialize plot with the first trace</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_quantity</span><span class="p">(</span>
+            <span class="n">t</span><span class="p">,</span>
+            <span class="n">xs</span><span class="p">[</span><span class="n">sim_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="n">t_range</span><span class="o">=</span><span class="n">t_range</span><span class="p">,</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+            <span class="n">t_label</span><span class="o">=</span><span class="n">t_label</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
+            <span class="n">scatter_label</span><span class="o">=</span><span class="n">sim_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="c1"># Add the rest of traces</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sim_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># print(f&quot;{i=}, {k=}, {sim_labels[k]=}&quot;)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">sim_labels</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">fig</span></div></div>
+
+
+<span class="c1">##################################################################################</span>
+
+
+<div class="viewcode-block" id="Simulator"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator">[docs]</a><span class="k">class</span> <span class="nc">Simulator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulator class for Langevin dynamics of a harmonic oscillator with</span>
+<span class="sd">    variable potential. Encapsulates the simulator, perform</span>
+<span class="sd">    simulations, analyses them and store results</span>
+<span class="sd">    of simulations.</span>
+
+<span class="sd">    Attributes:</span>
+
+<span class="sd">        tot_sims (int): default total number of simulations to run per batch.</span>
+<span class="sd">        dt (float): default time step.</span>
+<span class="sd">        tot_steps (int): default total steps of the simulation</span>
+<span class="sd">        noise_scaler (float): default brownian noise variance (k_B T).</span>
+<span class="sd">        k (Callable): function k(t) that gives the harmonic potential stifness as a function of time.</span>
+<span class="sd">        center (Callable): function center(t) of the harmonic potential as a function of time</span>
+<span class="sd">        harmonic_potential (bool): True if the potential is harmonic, False otherwise.</span>
+<span class="sd">        force (Callable): function force(x,t) applied on the particle at position x at time t.</span>
+<span class="sd">        potential (Callable): function potential(x,t) energy of the particle at position x at time t.</span>
+<span class="sd">        initial_distribution (Callable): function without arguments that</span>
+<span class="sd">            samples the initial distribution of the particles.</span>
+<span class="sd">        simulator (numba.Dispatcher): numba JIT function that performs simulations.</span>
+<span class="sd">        simulations_performed: number of batches of simulations that the Simulator has</span>
+<span class="sd">            done. It is the number of times that Simulator.run() has been</span>
+<span class="sd">            called.</span>
+<span class="sd">        simulation (list): list of Simulation objects that contain the results</span>
+<span class="sd">            of the simulations that have been runned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Simulator.__init__"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tot_sims</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">tot_steps</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">noise_scaler</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">snapshot_step</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">harmonic_potential</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_distribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the Simulator</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tot_sims (int, optional): total number of simulations. Defaults to 1000.</span>
+<span class="sd">            dt (float, optional): time step. Defaults to 0.001.</span>
+<span class="sd">            tot_steps (int, optional): total steps of each simulation. Defaults to 10000.</span>
+<span class="sd">            noise_scaler (float, optional): brownian noise scale k_B T. Defaults to 1.0.</span>
+<span class="sd">            snapshot_step (int, optional): save a snapshot of simulation at each snapshot_step time. Defaults to 100.</span>
+<span class="sd">            k (float function, optional): stiffness function k(t) of the potential. Defaults to k(t)=1.0.</span>
+<span class="sd">            center (float function, optional): center function of the potential. Defaults to center(t)=0.0.</span>
+<span class="sd">            harmonic_potential (boolean, optional): If True: the external potential</span>
+<span class="sd">              is harmonic with stiffness k(t) and center(t).</span>
+<span class="sd">              If False the external force is given by the force argument or</span>
+<span class="sd">              the the external potential is given by potential argument</span>
+<span class="sd">            force (float function(x,t), optional): the external force</span>
+<span class="sd">            potential (float function(x,t), optional): the external potential</span>
+<span class="sd">            initial_distribution (float function(), optional): initial</span>
+<span class="sd">              condition for x(0). Default: sampled from Boltzmann factor at time 0: exp(-U(x,0))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">initial_distribution_not_compiled</span> <span class="o">=</span> <span class="n">initial_distribution</span>
+        <span class="k">if</span> <span class="n">harmonic_potential</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+
+                <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Default stiffness for the harmonic potential</span>
+<span class="sd">                    t |--&gt; 1.0</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="k">return</span> <span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+
+                <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Default center for the harmonic potential</span>
+<span class="sd">                    t |--&gt; 0.0</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="k">return</span> <span class="mf">0.0</span>
+
+            <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Force on the particle&quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="o">-</span><span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+            <span class="k">def</span> <span class="nf">potential</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Harmonic potential energy&quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">k</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">initial_distribution_not_compiled</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+
+                <span class="k">def</span> <span class="nf">initial_distribution_not_compiled</span><span class="p">():</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Samples initial position according to the equilibrium distribution</span>
+<span class="sd">                    Returns:</span>
+<span class="sd">                        float: x random sample distributed according to exp(-k(0)*(x-center(0)**2/2))</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">center</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">k</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)))</span>
+
+        <span class="c1"># store the default parameters for simulations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tot_sims</span> <span class="o">=</span> <span class="n">tot_sims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tot_steps</span> <span class="o">=</span> <span class="n">tot_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_scaler</span> <span class="o">=</span> <span class="n">noise_scaler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_step</span> <span class="o">=</span> <span class="n">snapshot_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonic_potential</span> <span class="o">=</span> <span class="n">harmonic_potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force</span> <span class="o">=</span> <span class="n">force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">potential</span> <span class="o">=</span> <span class="n">potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_distribution</span> <span class="o">=</span> <span class="n">initial_distribution_not_compiled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">make_simulator</span><span class="p">(</span>
+            <span class="n">tot_sims</span><span class="o">=</span><span class="n">tot_sims</span><span class="p">,</span>
+            <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">tot_steps</span><span class="o">=</span><span class="n">tot_steps</span><span class="p">,</span>
+            <span class="n">noise_scaler</span><span class="o">=</span><span class="n">noise_scaler</span><span class="p">,</span>
+            <span class="n">snapshot_step</span><span class="o">=</span><span class="n">snapshot_step</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span>
+            <span class="n">harmonic_potential</span><span class="o">=</span><span class="n">harmonic_potential</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span>
+            <span class="n">initial_distribution</span><span class="o">=</span><span class="n">initial_distribution</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulations_performed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># list of Simulations classes to store results of simulations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Simulation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Simulator.run"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tot_sims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tot_steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">noise_scaler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">snapshot_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a batch of tot_sim simulations and appends the results to</span>
+<span class="sd">        Simulator.simulation list.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          tot_sims (int, optional): total number of simulations.</span>
+<span class="sd">          dt (float, optional): time step.</span>
+<span class="sd">          tot_steps (int, optional): total steps of each simulation.</span>
+<span class="sd">          noise_scaler (float, optional): brownian noise scale k_B T.</span>
+<span class="sd">          snapshot_step (int, optional): save a snapshot of simulation at</span>
+<span class="sd">            each snapshot_step time.</span>
+<span class="sd">          name (str, optional): name of the simulation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tot_sims</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tot_sims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tot_sims</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+        <span class="k">if</span> <span class="n">tot_steps</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tot_steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tot_steps</span>
+        <span class="k">if</span> <span class="n">noise_scaler</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">noise_scaler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_scaler</span>
+        <span class="k">if</span> <span class="n">snapshot_step</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">snapshot_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_step</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="p">(</span><span class="n">tot_sims</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tot_steps</span><span class="p">,</span> <span class="n">noise_scaler</span><span class="p">,</span> <span class="n">snapshot_step</span><span class="p">)</span>
+        <span class="n">sim</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span>
+            <span class="n">tot_sims</span><span class="p">,</span>
+            <span class="n">dt</span><span class="p">,</span>
+            <span class="n">tot_steps</span><span class="p">,</span>
+            <span class="n">noise_scaler</span><span class="p">,</span>
+            <span class="n">snapshot_step</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
+            <span class="n">results</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">harmonic_potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonic_potential</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">,</span>
+            <span class="n">potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulations_performed</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Simulator.analyse"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulator.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs the analysis of simulation number sim_num</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sim_num (int, optional): simulation number. Defaults to last simulation performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sim_num</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sim_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulations_performed</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">sim_num</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">sim_num</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulations_performed</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation number </span><span class="si">{</span><span class="n">sim_num</span><span class="si">}</span><span class="s2"> does not exists&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">[</span><span class="n">sim_num</span><span class="p">]</span><span class="o">.</span><span class="n">analyse</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Gabriel Téllez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
