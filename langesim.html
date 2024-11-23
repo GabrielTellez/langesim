@@ -295,6 +295,51 @@ work, etc..)</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.kde">
+<span class="sig-name descname"><span class="pre">kde</span></span><a class="headerlink" href="#langesim.simulator.Simulation.kde" title="Permalink to this definition"></a></dt>
+<dd><p>Kernel Density Estimation of quantities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kde</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">of</span> <span class="n">position</span>
+    <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">of</span> <span class="n">power</span>
+    <span class="s2">&quot;work&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">of</span> <span class="n">work</span>
+    <span class="s2">&quot;heat&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">of</span> <span class="n">heat</span>
+    <span class="s2">&quot;delta_U&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">of</span> <span class="n">energy</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">time</span> <span class="n">t</span>
+    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">of</span> <span class="n">energy</span>
+<span class="p">}</span>
+<span class="c1"># Example: Simulation.kde[&quot;x&quot;][i] gives the KDE of &quot;x&quot; at time snapshot number i.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.kde_grid_points_data">
+<span class="sig-name descname"><span class="pre">kde_grid_points_data</span></span><a class="headerlink" href="#langesim.simulator.Simulation.kde_grid_points_data" title="Permalink to this definition"></a></dt>
+<dd><p>KDE evaluated at grid points:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kde_grid_points_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">evaluated</span> <span class="n">at</span> <span class="n">grid</span> <span class="n">points</span> <span class="n">of</span> <span class="n">position</span>
+    <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">evaluated</span> <span class="n">at</span> <span class="n">grid</span> <span class="n">points</span> <span class="n">of</span> <span class="n">power</span>
+    <span class="s2">&quot;work&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">evaluated</span> <span class="n">at</span> <span class="n">grid</span> <span class="n">points</span> <span class="n">of</span> <span class="n">work</span>
+    <span class="s2">&quot;heat&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">KDE</span> <span class="n">evaluated</span> <span class="n">at</span> <span class="n">grid</span> <span class="n">points</span> <span class="n">of</span> <span class="n">heat</span>
+    <span class="s2">&quot;delta_U&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">KDE</span> <span class="n">evaluated</span> <span class="n">at</span> <span class="n">grid</span> <span class="n">points</span> <span class="n">of</span> <span class="n">energy</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">time</span> <span class="n">t</span>
+    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="nb">list</span> <span class="n">KDE</span> <span class="n">evaluated</span> <span class="n">at</span> <span class="n">grid</span> <span class="n">points</span> <span class="n">of</span> <span class="n">energy</span>
+<span class="p">}</span>
+<span class="c1"># Example: Simulation.kde_grid_points_data[&quot;x&quot;][i] = (x, P(x,t)) gives the KDE evaluated at grid points of &quot;x&quot; at time</span>
+<span class="n">snapshot</span> <span class="n">number</span> <span class="n">i</span><span class="o">.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="langesim.simulator.Simulation.pdf">
 <span class="sig-name descname"><span class="pre">pdf</span></span><a class="headerlink" href="#langesim.simulator.Simulation.pdf" title="Permalink to this definition"></a></dt>
 <dd><p>probability distribution functions of x, power, work, heat,
@@ -478,8 +523,26 @@ stored in average_func(quantity)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="langesim.simulator.Simulation.build_kde">
+<span class="sig-name descname"><span class="pre">build_kde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scott'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_kde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_kde" title="Permalink to this definition"></a></dt>
+<dd><p>Builds the Kernel Density Estimation (KDE) of a quantity at each time
+snapshot. The KDE is stored in self.kde[quantity] and the KDE evaluated
+at grid_points is stored in self.kde_grid_points_data[quantity] (to be used
+in PDF interpolation)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>string</em>) – quantity to build its KDE. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>bw</strong> (<em>string</em><em>, </em><em>optional</em>) – bandwidth for the KDE. Defaults to “scott”. For other options see KDEpy.FFTKDE documentation.</p></li>
+<li><p><strong>grid_points</strong> (<em>int</em><em>, </em><em>optional</em>) – number of grid points for the evaluation of the KDE. Defaults to None (automatic).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="langesim.simulator.Simulation.build_pdf">
-<span class="sig-name descname"><span class="pre">build_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_pdf" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">build_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kde'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scott'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/langesim/simulator.html#Simulation.build_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langesim.simulator.Simulation.build_pdf" title="Permalink to this definition"></a></dt>
 <dd><p>Builds the probability density function (PDF) for a quantity.
 The PDF is build and function is defined to access it in self.pdf(quantity)</p>
 <dl class="field-list simple">
@@ -488,6 +551,15 @@ The PDF is build and function is defined to access it in self.pdf(quantity)</p>
 <li><p><strong>quantity</strong> (<em>string</em>) – quantity to build its pdf. Should be in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
 <li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – bins for the histogram. Defaults to 300.</p></li>
 <li><p><strong>q_range</strong> (<em>list</em><em>, </em><em>optional</em>) – range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</p></li>
+<li><p><strong>method</strong> (<em>string</em><em>, </em><em>optional</em>) – method to build the PDF. Defaults to “kde” for Kernel Density Estimation. Other method is “legacy” which interpolate the histogram.</p></li>
+<li><p><strong>bw</strong> (<em>string</em><em>, </em><em>optional</em>) – bandwidth for the KDE. Defaults to “scott”. For other options see KDEpy.FFTKDE documentation. Not used if method is “legacy”.</p></li>
+<li><p><strong>grid_points</strong> (<em>int</em><em>, </em><em>optional</em>) – number of grid points for the KDE. Defaults to None (automatic). Not used if method is “legacy”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – if quantity is not in [“x”, “power”, “work”, “heat”, “delta_U”, “energy”]</p></li>
+<li><p><strong>ValueError</strong> – if method is not in [“kde”, “legacy”]</p></li>
 </ul>
 </dd>
 </dl>

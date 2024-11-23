@@ -81,6 +81,8 @@
 <span class="kn">from</span> <span class="nn">.graphic_utilities</span> <span class="kn">import</span> <span class="n">animate_simulation</span><span class="p">,</span> <span class="n">plot_quantity</span>
 <span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">make_sampler</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">KDEpy</span> <span class="kn">import</span> <span class="n">FFTKDE</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">griddata</span>
 
 
 <div class="viewcode-block" id="make_simulator"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.make_simulator">[docs]</a><span class="k">def</span> <span class="nf">make_simulator</span><span class="p">(</span>
@@ -407,6 +409,31 @@
 <span class="sd">            # Example: Simulation.histogram[&quot;x&quot;][i] gives the histogram of &quot;x&quot; at time</span>
 <span class="sd">            # snapshot number i.</span>
 
+<span class="sd">        kde (dict): Kernel Density Estimation of quantities::</span>
+
+<span class="sd">            kde = {</span>
+<span class="sd">                &quot;x&quot;: list of KDE of position</span>
+<span class="sd">                &quot;power&quot;: list of KDE of power</span>
+<span class="sd">                &quot;work&quot;: list of KDE of work</span>
+<span class="sd">                &quot;heat&quot;: list of KDE of heat</span>
+<span class="sd">                &quot;delta_U&quot;: list of KDE of energy difference between t=0 and time t</span>
+<span class="sd">                &quot;energy&quot;: list of KDE of energy</span>
+<span class="sd">            }</span>
+<span class="sd">            # Example: Simulation.kde[&quot;x&quot;][i] gives the KDE of &quot;x&quot; at time snapshot number i.</span>
+
+<span class="sd">        kde_grid_points_data (dict): KDE evaluated at grid points::</span>
+
+<span class="sd">                kde_grid_points_data = {</span>
+<span class="sd">                    &quot;x&quot;: list of KDE evaluated at grid points of position</span>
+<span class="sd">                    &quot;power&quot;: list of KDE evaluated at grid points of power</span>
+<span class="sd">                    &quot;work&quot;: list of KDE evaluated at grid points of work</span>
+<span class="sd">                    &quot;heat&quot;: list of KDE evaluated at grid points of heat</span>
+<span class="sd">                    &quot;delta_U&quot;: list KDE evaluated at grid points of energy difference between t=0 and time t</span>
+<span class="sd">                    &quot;energy&quot;: list KDE evaluated at grid points of energy</span>
+<span class="sd">                }</span>
+<span class="sd">                # Example: Simulation.kde_grid_points_data[&quot;x&quot;][i] = (x, P(x,t)) gives the KDE evaluated at grid points of &quot;x&quot; at time</span>
+<span class="sd">                snapshot number i.</span>
+
 <span class="sd">        pdf (dict): probability distribution functions of x, power, work, heat,</span>
 <span class="sd">            delta_U, energy::</span>
 
@@ -514,6 +541,8 @@
             <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">energy</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">FFTKDE</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde_grid_points_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">average_func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -534,7 +563,10 @@
         <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">q_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The use of q_range is not recommended. It can introduce bugs in the histograms if there are outliers.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The use of q_range is not recommended. It can introduce bugs in the histograms if there are outliers.&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">][:,</span> <span class="n">ti</span><span class="p">],</span>
@@ -545,7 +577,41 @@
             <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]))</span>
         <span class="p">]</span></div>
 
-<div class="viewcode-block" id="Simulation.build_pdf"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">build_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">q_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Simulation.build_kde"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_kde">[docs]</a>    <span class="k">def</span> <span class="nf">build_kde</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">bw</span><span class="o">=</span><span class="s2">&quot;scott&quot;</span><span class="p">,</span> <span class="n">grid_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the Kernel Density Estimation (KDE) of a quantity at each time</span>
+<span class="sd">        snapshot. The KDE is stored in self.kde[quantity] and the KDE evaluated</span>
+<span class="sd">        at grid_points is stored in self.kde_grid_points_data[quantity] (to be used</span>
+<span class="sd">        in PDF interpolation)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (string): quantity to build its KDE. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            bw (string, optional): bandwidth for the KDE. Defaults to &quot;scott&quot;. For other options see KDEpy.FFTKDE documentation.</span>
+<span class="sd">            grid_points (int, optional): number of grid points for the evaluation of the KDE. Defaults to None (automatic).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">qtys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">FFTKDE</span><span class="p">(</span><span class="n">bw</span><span class="o">=</span><span class="n">bw</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">qtys</span><span class="p">[:,</span> <span class="n">ti</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">qtys</span><span class="p">[:,</span> <span class="n">ti</span><span class="p">]</span> <span class="o">==</span> <span class="n">qtys</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ti</span><span class="p">])</span>
+            <span class="k">else</span> <span class="n">FFTKDE</span><span class="p">(</span><span class="n">bw</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">qtys</span><span class="p">[:,</span> <span class="n">ti</span><span class="p">])</span> <span class="c1"># if all values are the same, pdf is a delta distribution and adaptative bw will fail</span>
+            <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]))</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde_grid_points_data</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">grid_points</span><span class="o">=</span><span class="n">grid_points</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]))</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Simulation.build_pdf"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">build_pdf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">quantity</span><span class="p">,</span>
+        <span class="n">bins</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">q_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;kde&quot;</span><span class="p">,</span>
+        <span class="n">bw</span><span class="o">=</span><span class="s2">&quot;scott&quot;</span><span class="p">,</span>
+        <span class="n">grid_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the probability density function (PDF) for a quantity.</span>
 <span class="sd">        The PDF is build and function is defined to access it in self.pdf(quantity)</span>
 
@@ -553,6 +619,13 @@
 <span class="sd">            quantity (string): quantity to build its pdf. Should be in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
 <span class="sd">            bins (int, optional): bins for the histogram. Defaults to 300.</span>
 <span class="sd">            q_range (list, optional): range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.</span>
+<span class="sd">            method (string, optional): method to build the PDF. Defaults to &quot;kde&quot; for Kernel Density Estimation. Other method is &quot;legacy&quot; which interpolate the histogram.</span>
+<span class="sd">            bw (string, optional): bandwidth for the KDE. Defaults to &quot;scott&quot;. For other options see KDEpy.FFTKDE documentation. Not used if method is &quot;legacy&quot;.</span>
+<span class="sd">            grid_points (int, optional): number of grid points for the KDE. Defaults to None (automatic). Not used if method is &quot;legacy&quot;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if quantity is not in [&quot;x&quot;, &quot;power&quot;, &quot;work&quot;, &quot;heat&quot;, &quot;delta_U&quot;, &quot;energy&quot;]</span>
+<span class="sd">            ValueError: if method is not in [&quot;kde&quot;, &quot;legacy&quot;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">quantity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> must be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -560,53 +633,97 @@
         <span class="c1"># (Re)build the histogram as bins and q_range might be different</span>
         <span class="c1"># from previous evaluation</span>
 
-    
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;kde&quot;</span><span class="p">,</span> <span class="s2">&quot;legacy&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> must be in [&#39;kde&#39;, &#39;legacy&#39;]&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">q_range</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;legacy&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">q_range</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-            <span class="c1"># To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can</span>
-            <span class="c1"># use np.vectorize. Maybe use scipy interpolations.</span>
+            <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+                <span class="c1"># To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can</span>
+                <span class="c1"># use np.vectorize. Maybe use scipy interpolations.</span>
 
-            <span class="c1"># time t to snapshot index ti</span>
-            <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;In PDF of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">: time=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
-                <span class="p">)</span>
-            <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">ti</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">ti</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
-                <span class="n">ti</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># move last time to last bin</span>
+                <span class="c1"># time t to snapshot index ti</span>
+                <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;In PDF of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">: time=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">ti</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">ti</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                    <span class="n">ti</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># move last time to last bin</span>
 
-            <span class="c1"># self.histogram[quantity][ti, 0] # contains P(x)</span>
-            <span class="c1"># self.histogram[quantity][ti, 1] # contains x</span>
-            <span class="c1"># get the index corresponding to value x in the bins</span>
-            <span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">bins_x</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_x</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
-                <span class="p">)</span>
+                <span class="c1"># self.histogram[quantity][ti, 0] # contains P(x)</span>
+                <span class="c1"># self.histogram[quantity][ti, 1] # contains x</span>
+                <span class="c1"># get the index corresponding to value x in the bins</span>
+                <span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">bins_x</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_x</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_x</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                    <span class="p">)</span>
 
-            <span class="n">index_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bins_x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">index_x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">index_x</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">index_x</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">):</span>
-                <span class="n">index_x</span> <span class="o">=</span> <span class="n">index_x</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># move last x to last bin</span>
-            <span class="k">return</span> <span class="n">hist</span><span class="p">[</span><span class="n">index_x</span><span class="p">]</span>
+                <span class="n">index_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bins_x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">index_x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">index_x</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">index_x</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">):</span>
+                    <span class="n">index_x</span> <span class="o">=</span> <span class="n">index_x</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># move last x to last bin</span>
+                <span class="k">return</span> <span class="n">hist</span><span class="p">[</span><span class="n">index_x</span><span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span>
 
-        <span class="c1"># Trying interp2d but this does not work because of different</span>
-        <span class="c1"># ranges in x for different times t</span>
+            <span class="c1"># Trying interp2d but this does not work because of different</span>
+            <span class="c1"># ranges in x for different times t</span>
 
-        <span class="c1"># t = self.results[&#39;times&#39;]</span>
-        <span class="c1"># Using initial positions for all t does not work</span>
-        <span class="c1"># x = self.histogram[quantity][0, 1][:-1]</span>
-        <span class="c1"># This has the wrong shape</span>
-        <span class="c1"># pdf_values = self.histogram[quantity][:, 0]</span>
-        <span class="c1"># pdf = interp2d(x, t, pdf_values)</span>
+            <span class="c1"># t = self.results[&#39;times&#39;]</span>
+            <span class="c1"># Using initial positions for all t does not work</span>
+            <span class="c1"># x = self.histogram[quantity][0, 1][:-1]</span>
+            <span class="c1"># This has the wrong shape</span>
+            <span class="c1"># pdf_values = self.histogram[quantity][:, 0]</span>
+            <span class="c1"># pdf = interp2d(x, t, pdf_values)</span>
+
+        <span class="c1"># endif method = &quot;legacy&quot;</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;kde&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_kde</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">grid_points</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+                <span class="c1"># time t to snapshot index ti</span>
+                <span class="n">bins_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;In PDF of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">: time=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> is out of bounds [</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">ti</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">ti</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">):</span>
+                    <span class="n">ti</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>    
+
+                <span class="c1"># Try to use FFTKDE.evaluate on x. This only works if x is</span>
+                <span class="c1"># equidistant array </span>
+                <span class="n">kde_evaluate_success</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">pdf_at_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                        <span class="n">kde_evaluate_success</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">kde_evaluate_success</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">kde_evaluate_success</span><span class="p">:</span>
+                    <span class="c1"># Fallback to interpolate the PDF KDE at x using griddata</span>
+                    <span class="n">pdf_at_x</span> <span class="o">=</span> <span class="n">griddata</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">kde_grid_points_data</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">kde_grid_points_data</span><span class="p">[</span><span class="n">quantity</span><span class="p">][</span><span class="n">ti</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="n">x</span><span class="p">,</span>
+                        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">pdf_at_x</span><span class="p">)):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PDF of </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2"> is NaN at x=</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> and t=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">pdf_at_x</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">[</span><span class="n">quantity</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Simulation.build_averages"><a class="viewcode-back" href="../../langesim.html#langesim.simulator.Simulation.build_averages">[docs]</a>    <span class="k">def</span> <span class="nf">build_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the average of a quantity.</span>
@@ -745,6 +862,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds all histograms, PDF, averages and variances&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_labels</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_histogram</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_kde</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_pdf</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_averages</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_variances</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
