@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "langesim"
-version = "0.1.3"
+version = "0.1.4"
 description = "Langevin simulator of an overdamped brownian particle in an arbitrary time-dependent potential"
 authors = ["Gabriel Tellez"]
 readme = "README.md"
@@ -12,6 +12,7 @@ numba = ">=0.56.4, <0.60.0"
 cloudpickle = "^2.2.0"
 scipy = "^1.9.3"
 plotly = "^5.11.0"
+kdepy = "^1.1.11"
 
 
 [tool.poetry.group.dev.dependencies]

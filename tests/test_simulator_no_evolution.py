@@ -1,10 +1,11 @@
-from langesim import make_simulator
+from langesim import make_simulator, Simulator
 import numpy as np
+from scipy.stats import entropy
 from pytest import approx
 import pytest
 
 
-def test_no_evolution():
+def test_no_evolution_make_simulator():
     """Tests for no change in probability distribution when the potential
     does not change"""
 
@@ -69,3 +70,51 @@ def test_no_evolution():
         assert np.average(energy[:, time_index]) == approx(
             0.5, rel=4.75 * tol
         ), f"on average energy should be (1/2) k_B T. Error on time_index={time_index}"
+
+def test_no_evolution_kde():
+    """Tests for no change in probability distribution computed with KDE when the potential
+    does not change"""
+
+    def k1(t):
+        return 1.0
+
+    def center1(t):
+        return 2.0
+
+    def Peq(x):
+        """Equilibrium distribution"""
+        return np.exp(-0.5 * k1(0.0) * (x - center1(0.0)) ** 2) / np.sqrt(
+            2 * np.pi / k1(0.0)
+        )
+
+    tot_sims = 100000
+    tot_steps = 1000
+    snapshot_step = 100
+    simulator = Simulator(
+        tot_sims=tot_sims,
+        dt=0.00001,
+        tot_steps=tot_steps,
+        snapshot_step=snapshot_step,
+        k=k1,
+        center=center1,
+    )
+    simulator.run()
+    sim = simulator.simulation[0]
+    sim.build_pdf("x", method="kde")
+    xs = np.linspace(-1.0, 5.0, 1000)
+
+    theoretical_pdf = Peq(xs)
+
+    for t in sim.results["times"]:
+        # Build the KDE for the current snapshot
+        kde_pdf = sim.pdf["x"](xs, t)  # Get the KDE at time `t`
+
+        # Compute the KL divergence between theoretical and KDE PDF
+        kl_divergence = entropy(theoretical_pdf, kde_pdf)
+
+        # Assert that the KL divergence is sufficiently small
+        tolerance = 5e-4
+        assert kl_divergence < tolerance, (
+            f"KL divergence at t={t} is too large: {kl_divergence}\n"
+            f"KDE PDF does not match the theoretical PDF at time {t}."
+        )

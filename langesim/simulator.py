@@ -10,6 +10,8 @@ import pickle
 from .graphic_utilities import animate_simulation, plot_quantity
 from .sampler import make_sampler
 import warnings
+from KDEpy import FFTKDE
+from scipy.interpolate import griddata
 
 
 def make_simulator(
@@ -336,6 +338,31 @@ class Simulation:
             # Example: Simulation.histogram["x"][i] gives the histogram of "x" at time
             # snapshot number i.
 
+        kde (dict): Kernel Density Estimation of quantities::
+
+            kde = {
+                "x": list of KDE of position
+                "power": list of KDE of power
+                "work": list of KDE of work
+                "heat": list of KDE of heat
+                "delta_U": list of KDE of energy difference between t=0 and time t
+                "energy": list of KDE of energy
+            }
+            # Example: Simulation.kde["x"][i] gives the KDE of "x" at time snapshot number i.
+
+        kde_grid_points_data (dict): KDE evaluated at grid points::
+
+                kde_grid_points_data = {
+                    "x": list of KDE evaluated at grid points of position
+                    "power": list of KDE evaluated at grid points of power
+                    "work": list of KDE evaluated at grid points of work
+                    "heat": list of KDE evaluated at grid points of heat
+                    "delta_U": list KDE evaluated at grid points of energy difference between t=0 and time t
+                    "energy": list KDE evaluated at grid points of energy
+                }
+                # Example: Simulation.kde_grid_points_data["x"][i] = (x, P(x,t)) gives the KDE evaluated at grid points of "x" at time
+                snapshot number i.
+
         pdf (dict): probability distribution functions of x, power, work, heat,
             delta_U, energy::
 
@@ -443,6 +470,8 @@ class Simulation:
             "energy": energy,
         }
         self.histogram: dict[str, List[Tuple[np.ndarray, np.ndarray]]] = {}
+        self.kde: dict[str, List[FFTKDE]] = {}
+        self.kde_grid_points_data: dict[str, List[Tuple[np.ndarray, np.ndarray]]] = {}
         self.pdf: dict[str, Callable[[float, float], float]] = {}
         self.averages: dict[str, np.array] = {}
         self.average_func: dict[str, Callable[[float], float]] = {}
@@ -463,7 +492,10 @@ class Simulation:
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
         if q_range is not None:
-            warnings.warn("The use of q_range is not recommended. It can introduce bugs in the histograms if there are outliers.", UserWarning)
+            warnings.warn(
+                "The use of q_range is not recommended. It can introduce bugs in the histograms if there are outliers.",
+                UserWarning,
+            )
         self.histogram[quantity] = [
             np.histogram(
                 self.results[quantity][:, ti],
@@ -474,7 +506,41 @@ class Simulation:
             for ti in range(0, len(self.results["times"]))
         ]
 
-    def build_pdf(self, quantity, bins=300, q_range=None):
+    def build_kde(self, quantity, bw="scott", grid_points=None):
+        """Builds the Kernel Density Estimation (KDE) of a quantity at each time
+        snapshot. The KDE is stored in self.kde[quantity] and the KDE evaluated
+        at grid_points is stored in self.kde_grid_points_data[quantity] (to be used
+        in PDF interpolation)
+
+        Args:
+            quantity (string): quantity to build its KDE. Should be in ["x", "power", "work", "heat", "delta_U", "energy"]
+            bw (string, optional): bandwidth for the KDE. Defaults to "scott". For other options see KDEpy.FFTKDE documentation.
+            grid_points (int, optional): number of grid points for the evaluation of the KDE. Defaults to None (automatic).
+        """
+        if quantity not in self.result_labels:
+            raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
+
+        qtys = self.results[quantity]
+        self.kde[quantity] = [
+            FFTKDE(bw=bw).fit(qtys[:, ti])
+            if not np.all(qtys[:, ti] == qtys[0, ti])
+            else FFTKDE(bw=1e-6).fit(qtys[:, ti]) # if all values are the same, pdf is a delta distribution and adaptative bw will fail
+            for ti in range(0, len(self.results["times"]))
+        ]
+        self.kde_grid_points_data[quantity] = [
+            self.kde[quantity][ti].evaluate(grid_points=grid_points)
+            for ti in range(0, len(self.results["times"]))
+        ]
+
+    def build_pdf(
+        self,
+        quantity,
+        bins=300,
+        q_range=None,
+        method="kde",
+        bw="scott",
+        grid_points=None,
+    ):
         """Builds the probability density function (PDF) for a quantity.
         The PDF is build and function is defined to access it in self.pdf(quantity)
 
@@ -482,6 +548,13 @@ class Simulation:
             quantity (string): quantity to build its pdf. Should be in ["x", "power", "work", "heat", "delta_U", "energy"]
             bins (int, optional): bins for the histogram. Defaults to 300.
             q_range (list, optional): range for the quantity. Defaults to None for automatic range. Not using automatic range can introduce bugs in the histograms if there are outliers.
+            method (string, optional): method to build the PDF. Defaults to "kde" for Kernel Density Estimation. Other method is "legacy" which interpolate the histogram.
+            bw (string, optional): bandwidth for the KDE. Defaults to "scott". For other options see KDEpy.FFTKDE documentation. Not used if method is "legacy".
+            grid_points (int, optional): number of grid points for the KDE. Defaults to None (automatic). Not used if method is "legacy".
+
+        Raises:
+            ValueError: if quantity is not in ["x", "power", "work", "heat", "delta_U", "energy"]
+            ValueError: if method is not in ["kde", "legacy"]
         """
         if quantity not in self.result_labels:
             raise ValueError(f"quantity {quantity} must be in {self.result_labels}")
@@ -489,53 +562,97 @@ class Simulation:
         # (Re)build the histogram as bins and q_range might be different
         # from previous evaluation
 
-    
+        if method not in ["kde", "legacy"]:
+            raise ValueError(f"method {method} must be in ['kde', 'legacy']")
 
-        self.build_histogram(quantity, bins, q_range)
+        if method == "legacy":
+            self.build_histogram(quantity, bins, q_range)
 
-        def pdf(x, t):
-            # To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can
-            # use np.vectorize. Maybe use scipy interpolations.
+            def pdf(x, t):
+                # To do: Rewrite this to be numpy compatible? Nevermind: afterwards one can
+                # use np.vectorize. Maybe use scipy interpolations.
 
-            # time t to snapshot index ti
-            bins_t = self.results["times"]
-            if t < np.min(bins_t) or t > np.max(bins_t):
-                raise ValueError(
-                    f"In PDF of {quantity}: time={t} is out of bounds [{np.min(bins_t)}, {np.max(bins_t)}]"
-                )
-            ti = np.digitize(t, bins_t) - 1
-            if ti < 0:
-                ti = 0
-            if ti == len(bins_t):
-                ti = len(bins_t) - 1 # move last time to last bin
+                # time t to snapshot index ti
+                bins_t = self.results["times"]
+                if t < np.min(bins_t) or t > np.max(bins_t):
+                    raise ValueError(
+                        f"In PDF of {quantity}: time={t} is out of bounds [{np.min(bins_t)}, {np.max(bins_t)}]"
+                    )
+                ti = np.digitize(t, bins_t) - 1
+                if ti < 0:
+                    ti = 0
+                if ti == len(bins_t):
+                    ti = len(bins_t) - 1  # move last time to last bin
 
-            # self.histogram[quantity][ti, 0] # contains P(x)
-            # self.histogram[quantity][ti, 1] # contains x
-            # get the index corresponding to value x in the bins
-            (hist, bins_x) = self.histogram[quantity][ti]
-            if x < np.min(bins_x) or x > np.max(bins_x):
-                raise ValueError(
-                    f"{quantity}={x} is out of bounds [{np.min(bins_x)}, {np.max(bins_x)}]"
-                )
+                # self.histogram[quantity][ti, 0] # contains P(x)
+                # self.histogram[quantity][ti, 1] # contains x
+                # get the index corresponding to value x in the bins
+                (hist, bins_x) = self.histogram[quantity][ti]
+                if x < np.min(bins_x) or x > np.max(bins_x):
+                    raise ValueError(
+                        f"{quantity}={x} is out of bounds [{np.min(bins_x)}, {np.max(bins_x)}]"
+                    )
 
-            index_x = np.digitize(x, bins_x) - 1
-            if index_x < 0:
-                index_x = 0
-            if index_x == len(hist):
-                index_x = index_x - 1 # move last x to last bin
-            return hist[index_x]
+                index_x = np.digitize(x, bins_x) - 1
+                if index_x < 0:
+                    index_x = 0
+                if index_x == len(hist):
+                    index_x = index_x - 1  # move last x to last bin
+                return hist[index_x]
 
-        self.pdf[quantity] = np.vectorize(pdf)
+            self.pdf[quantity] = np.vectorize(pdf)
 
-        # Trying interp2d but this does not work because of different
-        # ranges in x for different times t
+            # Trying interp2d but this does not work because of different
+            # ranges in x for different times t
 
-        # t = self.results['times']
-        # Using initial positions for all t does not work
-        # x = self.histogram[quantity][0, 1][:-1]
-        # This has the wrong shape
-        # pdf_values = self.histogram[quantity][:, 0]
-        # pdf = interp2d(x, t, pdf_values)
+            # t = self.results['times']
+            # Using initial positions for all t does not work
+            # x = self.histogram[quantity][0, 1][:-1]
+            # This has the wrong shape
+            # pdf_values = self.histogram[quantity][:, 0]
+            # pdf = interp2d(x, t, pdf_values)
+
+        # endif method = "legacy"
+
+        if method == "kde":
+            self.build_kde(quantity, bw, grid_points)
+
+            def pdf(x, t):
+                # time t to snapshot index ti
+                bins_t = self.results["times"]
+                if t < np.min(bins_t) or t > np.max(bins_t):
+                    raise ValueError(
+                        f"In PDF of {quantity}: time={t} is out of bounds [{np.min(bins_t)}, {np.max(bins_t)}]"
+                    )
+                ti = np.digitize(t, bins_t) - 1
+                if ti < 0:
+                    ti = 0
+                if ti == len(bins_t):
+                    ti = len(bins_t) - 1    
+
+                # Try to use FFTKDE.evaluate on x. This only works if x is
+                # equidistant array 
+                kde_evaluate_success = False
+                if type(x) == np.ndarray:
+                    try:
+                        pdf_at_x = self.kde[quantity][ti].evaluate(x)
+                        kde_evaluate_success = True
+                    except ValueError:
+                        kde_evaluate_success = False
+                if not kde_evaluate_success:
+                    # Fallback to interpolate the PDF KDE at x using griddata
+                    pdf_at_x = griddata(
+                        self.kde_grid_points_data[quantity][ti][0],
+                        self.kde_grid_points_data[quantity][ti][1],
+                        x,
+                        method="linear",
+                    )
+                    if np.any(np.isnan(pdf_at_x)):
+                        raise ValueError(f"PDF of {quantity} is NaN at x={x} and t={t}")
+
+                return pdf_at_x
+
+            self.pdf[quantity] = np.vectorize(pdf)
 
     def build_averages(self, quantity):
         """Computes the average of a quantity.
@@ -674,6 +791,7 @@ class Simulation:
         """Builds all histograms, PDF, averages and variances"""
         for k in self.result_labels:
             self.build_histogram(k)
+            self.build_kde(k)
             self.build_pdf(k)
             self.build_averages(k)
             self.build_variances(k)

@@ -45,7 +45,7 @@ def test_simulator_quartic_potential_initial_condition():
     k0 = 1.0
 
     def U(x, t):
-        k = k0 # + 1.0 * t
+        k = k0  # + 1.0 * t
         return k * x**4 / 4.0
 
     simulator = Simulator(harmonic_potential=False, potential=U)
@@ -57,7 +57,7 @@ def test_simulator_quartic_potential_initial_condition():
 
     histo, xs = sim.histogram["x"][0]
     fs = np.exp(-U(xs[1:], 0))
-    #fs = np.exp(-U(xs[:-1], 0))
+    # fs = np.exp(-U(xs[:-1], 0))
     # normalization
     Z = gamma(1 / 4) / np.sqrt(2 * np.sqrt(k0))
     fs = fs / Z

@@ -1,6 +1,7 @@
 from langesim import Simulator
 import numpy as np
 import pytest
+from scipy.stats import entropy
 
 
 def test_init_simulator():
@@ -127,6 +128,8 @@ def assert_sim_analysis(sim):
     """Asserts if a simulation has perfomed its analysis"""
     for k in sim.result_labels:
         assert k in sim.histogram
+        assert k in sim.kde
+        assert k in sim.kde_grid_points_data
         assert k in sim.pdf
         assert k in sim.averages
         assert k in sim.average_func
@@ -254,7 +257,7 @@ def test_linear_potential_average_x():
     def initial_condition():
         return -3.0
 
-    tot_sims = 100000
+    tot_sims = 100_000
     simulator = Simulator(
         tot_sims=tot_sims,
         harmonic_potential=False,
@@ -270,3 +273,44 @@ def test_linear_potential_average_x():
         assert sim.average_func["x"](t) == pytest.approx(
             f * t + initial_condition(), abs=var * tol
         ), f"average position not equal at time t={t}"
+
+
+@pytest.mark.parametrize("method", ["kde", "legacy"])
+def test_brownian_motion(method):
+    """Test brownian motion with null force. PDF should be gaussian
+    """
+
+    def U(x, t):
+        return 0.0
+
+    def initial_condition():
+        return 0.0
+
+    def sigma2(t):
+        return 2.0 * t
+
+    def P_theo(x, t):
+        """Theoretical PDF for Brownian motion"""
+        return np.exp(-x ** 2 / (2.0 * sigma2(t))) / np.sqrt(2 * np.pi * sigma2(t))
+
+    tot_sims = 100_000
+    dt = 0.0001
+    simulator = Simulator(
+        tot_sims=tot_sims,
+        dt=dt,
+        harmonic_potential=False,
+        potential=U,
+        initial_distribution=initial_condition,
+    )
+    simulator.run()
+    sim = simulator.simulation[0]
+    sim.build_pdf("x", method=method)
+    tol = 1e-3 if method == "kde" else 5e-3
+    for t in sim.results["times"][1:]:
+        xs = np.linspace(-2.0 * sigma2(t) , 2.0 * sigma2(t), 20)
+        pdf_sim = sim.pdf["x"](xs, t)
+        pdf_theo = P_theo(xs, t)
+        kl_div = entropy(pdf_theo, pdf_sim)
+        assert kl_div <= tol, f"KL divergence between theoretical and numerical PDF is {kl_div}>{tol} at time t={t}"
+
+
